@@ -12,7 +12,7 @@ def register_all_handlers(dp: Dispatcher) -> None:
     register_other_handlers(dp)
 
 
-def main():
+def start_telegram_bot():
     bot = Bot(token=TgBot.TOKEN, parse_mode='HTML')
     dp = Dispatcher(bot)
     register_all_handlers(dp)
@@ -21,5 +21,3 @@ def main():
     executor.start_polling(dp, skip_updates=True)
 
 
-if __name__ == "__main__":
-    main()
