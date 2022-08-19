@@ -1,9 +1,9 @@
 from aiogram import Bot, Dispatcher, executor
 from loguru import logger
 
-from telegram_bot.bot import TgBot
-from telegram_bot.bot.handlers import *
-from telegram_bot.bot.database import register_models
+from .bot import TgBot
+from .bot.database import register_models
+from .bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers
 
 
 def register_all_handlers(dp: Dispatcher) -> None:

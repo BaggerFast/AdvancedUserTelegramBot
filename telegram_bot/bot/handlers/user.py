@@ -6,6 +6,8 @@ from telegram_bot.bot.keyboards import main_keyboard_start_pro, main_keyboard_st
 from telegram_bot.bot import TgBot
 
 
+# region Commands
+
 async def start(msg: types.Message) -> None:
     add_user(msg.from_user.id)
     bot: Bot = msg.bot
@@ -15,6 +17,13 @@ async def start(msg: types.Message) -> None:
     else:
         await bot.send_message(msg.from_user.id, "Hi, this is super user-bot!", reply_markup=main_keyboard_start_trial)
 
+
+async def check_oup_process(check_out_query: PreCheckoutQuery) -> None:
+    bot: Bot = check_out_query.bot
+    await bot.answer_pre_checkout_query(check_out_query.id, ok=True)
+
+
+# region Vip
 
 async def buy_vip(msg: types.Message) -> None:
     bot: Bot = msg.bot
@@ -29,19 +38,18 @@ async def buy_vip(msg: types.Message) -> None:
                            protect_content=True)
 
 
-async def check_oup_process(check_out_query: PreCheckoutQuery) -> None:
-    bot: Bot = check_out_query.bot
-    await bot.answer_pre_checkout_query(check_out_query.id, ok=True)
-
-
-async def on_succes_buy(msg: types.Message) -> None:
+async def on_success_buy(msg: types.Message) -> None:
     bot: Bot = msg.bot
     set_vip(msg.from_user.id)
     await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!", reply_markup=main_keyboard_start_pro)
+
+# endregion
+
+# endregion
 
 
 def register_users_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(start, commands=["start"])
     dp.register_message_handler(buy_vip, content_types=['text'], text="Купить полную версию")
-    dp.register_message_handler(on_succes_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
+    dp.register_message_handler(on_success_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
     dp.register_pre_checkout_query_handler(check_oup_process, lambda q: True)

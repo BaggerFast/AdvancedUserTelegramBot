@@ -1,4 +1,4 @@
-telethon
+Telethon
 aiogram
 asyncio
 loguru
