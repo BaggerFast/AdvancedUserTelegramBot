@@ -1,9 +1,9 @@
 from aiogram import Bot, Dispatcher, executor
 from loguru import logger
 
-from bot import TgBot
-from bot.handlers import *
-from bot.database import register_models
+from telegram_bot.bot import TgBot
+from telegram_bot.bot.handlers import *
+from telegram_bot.bot.database import register_models
 
 
 def register_all_handlers(dp: Dispatcher) -> None:
@@ -17,7 +17,5 @@ def start_telegram_bot():
     dp = Dispatcher(bot)
     register_all_handlers(dp)
     register_models()
-    logger.info('Bot start')
+    logger.info('Bot starts')
     executor.start_polling(dp, skip_updates=True)
-
-
