@@ -12,7 +12,8 @@ class Database(metaclass=SingletonMeta):
 
     def __init__(self):
         self.__engine = create_engine('sqlite:///database.db')
-        self.__session = sessionmaker(bind=self.__engine)()
+        session = sessionmaker(bind=self.__engine)
+        self.__session = session()
 
     @property
     def session(self):
@@ -21,3 +22,4 @@ class Database(metaclass=SingletonMeta):
     @property
     def engine(self):
         return self.__engine
+

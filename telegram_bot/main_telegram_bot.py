@@ -15,8 +15,8 @@ def register_all_handlers(dp: Dispatcher) -> None:
 
 def start_telegram_bot():
     bot = Bot(token=TgBot.TOKEN, parse_mode='HTML')
-    dp = Dispatcher(bot, storage=MemoryStorage)
-    register_all_handlers(dp)
+    dp = Dispatcher(bot, storage=MemoryStorage())
     register_models()
+    register_all_handlers(dp)
     logger.info('Bot starts')
     executor.start_polling(dp, skip_updates=True)
