@@ -1,4 +1,5 @@
 from aiogram import Bot, Dispatcher, executor
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from loguru import logger
 
 from telegram_bot.bot import TgBot
@@ -14,7 +15,7 @@ def register_all_handlers(dp: Dispatcher) -> None:
 
 def start_telegram_bot():
     bot = Bot(token=TgBot.TOKEN, parse_mode='HTML')
-    dp = Dispatcher(bot)
+    dp = Dispatcher(bot, storage=MemoryStorage)
     register_all_handlers(dp)
     register_models()
     logger.info('Bot starts')
