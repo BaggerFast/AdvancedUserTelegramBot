@@ -1,5 +1,8 @@
 import os
 
+import subprocess
+
+import loguru
 from aiogram import types, Dispatcher, Bot
 from aiogram.types import LabeledPrice, PreCheckoutQuery, ContentTypes
 from aiogram.dispatcher import FSMContext
@@ -9,6 +12,7 @@ from telegram_bot.bot.keyboards import main_keyboard_start_pro, main_keyboard_st
 from telegram_bot.bot import TgBot
 from telegram_bot.bot.keyboards.inline import me_telegram_keyboard
 from telegram_bot.bot.misc import StartUserBot
+from telegram_bot.bot.misc import send_code
 
 
 async def start(msg: types.Message) -> None:
@@ -48,30 +52,51 @@ async def input_api_hash(msg: types.Message, state: FSMContext) -> None:
         async with state.proxy() as data:
             data['write_api_hash'] = msg.text
     else:
-        await bot.send_message(msg.from_user.id, "api-hash должен состоять из 32 цифры! Вы где-то ошиблись!")
+        await bot.send_message(msg.from_user.id, "api-hash должен состоять из 32 символов! Вы где-то ошиблись!")
         return
+    await bot.send_message(msg.from_user.id, "Введите ваш номер телефона:")
     await state.set_state(StartUserBot.write_phone)
 
 
 async def input_phone(msg: types.Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     async with state.proxy() as data:
-        data['phone'] = msg.text
+        data['write_phone'] = msg.textTr
+    user_data = await state.get_data()
+    try:
+        await send_code(phone=user_data["write_phone"],
+                        api_id=user_data["write_api_id"],
+                        api_hash=user_data["write_api_hash"])
+    except Exception:
+        loguru.logger.error("Хрень с отправкой смски")
+        await bot.send_message(msg.from_user.id, "Не удалось отправить код подтверждения!\n"
+                                                 "Попробуйте сново через 24 часа")
+        await state.finish()
+        return
+    await bot.send_message(msg.from_user.id, "Введите код подтверждения из телеграма: ")
     await state.set_state(StartUserBot.write_auth_code)
 
 
 async def input_oauth_code(msg: types.Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     async with state.proxy() as data:
-        data['oauth'] = msg.text
+        if msg.text == "None":
+            data['write_auth_code'] = "None"
+        else:
+            data['write_auth_code'] = msg.text
 
+    user_data = await state.get_data()
+    loguru.logger.debug("Запускаю сабпроцесс")
+    subprocess.Popen(["venv/Scripts/python.exe", "user_bot/main_user_bot.py", str(user_data["write_api_id"]),
+                      str(user_data['write_api_hash']), str(user_data['write_phone']), str(msg.from_user.id),
+                      str(user_data['write_auth_code'])])
+    loguru.logger.debug("после сабпроцесс")
     await bot.send_message(msg.from_user.id, "User bot запущен")
     await state.finish()
 
+
 # endregion
 
-
-# TODO input of user settings
 
 # region Vip
 
@@ -98,7 +123,9 @@ async def check_oup_process(check_out_query: PreCheckoutQuery) -> None:
 async def on_success_buy(msg: types.Message) -> None:
     bot: Bot = msg.bot
     set_vip(msg.from_user.id)
-    await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!", reply_markup=main_keyboard_start_pro)
+    await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!",
+                           reply_markup=main_keyboard_start_pro)
+
 
 # endregion
 
@@ -115,4 +142,3 @@ def register_users_handlers(dp: Dispatcher) -> None:
     dp.register_pre_checkout_query_handler(check_oup_process, lambda q: True)
     dp.register_message_handler(on_success_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
     dp.register_message_handler(start_input_user_settings, content_types=['text'], text="Подключить бота", state=None)
-
