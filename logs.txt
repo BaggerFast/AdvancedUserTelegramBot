@@ -1,0 +1,1 @@
+2022-08-21 21:44:47.735 | ERROR    | __main__:main:26 - list index out of range

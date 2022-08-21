@@ -1,5 +1,14 @@
+# Telegram
 Telethon
 aiogram
-asyncio
-loguru
+
+# Database
 SQLAlchemy
+
+# Debug
+pylint
+loguru
+
+# Other
+asyncio
+

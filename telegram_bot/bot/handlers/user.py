@@ -1,6 +1,7 @@
 import os
 
 import subprocess
+import sys
 
 import loguru
 from aiogram import types, Dispatcher, Bot
@@ -61,7 +62,7 @@ async def input_api_hash(msg: types.Message, state: FSMContext) -> None:
 async def input_phone(msg: types.Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     async with state.proxy() as data:
-        data['write_phone'] = msg.textTr
+        data['write_phone'] = msg.text
     user_data = await state.get_data()
     try:
         await send_code(phone=user_data["write_phone"],
@@ -70,7 +71,7 @@ async def input_phone(msg: types.Message, state: FSMContext) -> None:
     except Exception:
         loguru.logger.error("Хрень с отправкой смски")
         await bot.send_message(msg.from_user.id, "Не удалось отправить код подтверждения!\n"
-                                                 "Попробуйте сново через 24 часа")
+                                                 "Попробуйте снова через 24 часа")
         await state.finish()
         return
     await bot.send_message(msg.from_user.id, "Введите код подтверждения из телеграма: ")
@@ -87,9 +88,10 @@ async def input_oauth_code(msg: types.Message, state: FSMContext) -> None:
 
     user_data = await state.get_data()
     loguru.logger.debug("Запускаю сабпроцесс")
-    subprocess.Popen(["venv/Scripts/python.exe", "user_bot/main_user_bot.py", str(user_data["write_api_id"]),
-                      str(user_data['write_api_hash']), str(user_data['write_phone']), str(msg.from_user.id),
-                      str(user_data['write_auth_code'])])
+    print(user_data)
+    user_data['id'] = msg.from_user.id
+    arg = list(map(str, user_data.values()))
+    subprocess.Popen([sys.executable, "user_bot/main_user_bot.py", *arg])
     loguru.logger.debug("после сабпроцесс")
     await bot.send_message(msg.from_user.id, "User bot запущен")
     await state.finish()

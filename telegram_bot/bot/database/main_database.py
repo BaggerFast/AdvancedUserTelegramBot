@@ -22,4 +22,3 @@ class Database(metaclass=SingletonMeta):
     @property
     def engine(self):
         return self.__engine
-
