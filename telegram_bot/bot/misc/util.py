@@ -1,7 +1,13 @@
 import os
+import subprocess
+import sys
 
 from telethon import TelegramClient
 from misc.path import PathManager
+
+
+def start_user_bot(arg):
+    subprocess.Popen([sys.executable, "user_bot/main_user_bot.py", *arg])
 
 
 async def send_code(phone, api_id, api_hash):

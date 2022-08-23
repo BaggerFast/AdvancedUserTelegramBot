@@ -8,16 +8,17 @@ from aiogram import types, Dispatcher, Bot
 from aiogram.types import LabeledPrice, PreCheckoutQuery, ContentTypes
 from aiogram.dispatcher import FSMContext
 
-from telegram_bot.bot.database.methods import add_user, check_vip, set_vip
+from telegram_bot.bot.database.methods import create_user, check_vip, set_vip, get_user_by_id_telegram_id
 from telegram_bot.bot.keyboards import main_keyboard_start_pro, main_keyboard_start_trial
 from telegram_bot.bot import TgBot
 from telegram_bot.bot.keyboards.inline import me_telegram_keyboard
 from telegram_bot.bot.misc import StartUserBot
 from telegram_bot.bot.misc import send_code
+from telegram_bot.bot.misc.util import start_user_bot
 
 
 async def start(msg: types.Message) -> None:
-    add_user(msg.from_user.id)
+    create_user(msg.from_user.id)
     bot: Bot = msg.bot
     if check_vip(msg.from_user.id):
         await bot.send_message(msg.from_user.id, "Hi, this is super user-bot!", reply_markup=main_keyboard_start_pro)
@@ -30,6 +31,13 @@ async def start(msg: types.Message) -> None:
 async def start_input_user_settings(msg: types.Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
+    user = get_user_by_id_telegram_id(user_id)
+    if user:
+        if user.session:
+            start_user_bot(user.session)
+            await state.finish()
+    else:
+        create_user(user_id)
     await bot.send_message(user_id, 'Узнать данные можно 👇', reply_markup=me_telegram_keyboard)
     await bot.send_message(user_id, "Введите ваш api-id:")
     await state.set_state(StartUserBot.write_api_id)
@@ -91,7 +99,7 @@ async def input_oauth_code(msg: types.Message, state: FSMContext) -> None:
     print(user_data)
     user_data['id'] = msg.from_user.id
     arg = list(map(str, user_data.values()))
-    subprocess.Popen([sys.executable, "user_bot/main_user_bot.py", *arg])
+    start_user_bot(arg)
     loguru.logger.debug("после сабпроцесс")
     await bot.send_message(msg.from_user.id, "User bot запущен")
     await state.finish()

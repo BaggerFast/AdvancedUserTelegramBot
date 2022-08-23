@@ -1,13 +1,12 @@
 import loguru
-from sqlalchemy import select, update
+from sqlalchemy import select, update, exc
 
 from .main_database import Database
-from .models import User
+from .models import User, Session
 
 
-def add_user(telegram_id) -> None:
+def create_user(telegram_id: int) -> None:
     select_query = select(User.telegram_id).where(User.telegram_id == telegram_id)
-    loguru.logger.debug("Проверка на регистрацию")
     session = Database().session
     if session.execute(select_query).fetchone():
         loguru.logger.debug(f"Такой пользователь уже есть в базе! Его Telegram-id - {telegram_id}")
@@ -17,6 +16,21 @@ def add_user(telegram_id) -> None:
     session.commit()
     loguru.logger.debug(f"Добавлен новый юзер! Telegram-id - {telegram_id}")
 
+
+def get_user_by_id_telegram_id(telegram_id: int) -> User | None:
+    try:
+        return Database().session.query(User).filter(User.telegram_id == telegram_id).one()
+    except exc.NoResultFound:
+        return None
+
+
+def create_user_bot_session(user: User, user_bot_session: str):
+    session = Database().session
+    session.add(Session(user_id=user.id, session=user_bot_session))
+    session.commit()
+
+
+# region Vip
 
 def check_vip(telegram_id) -> bool:
     select_query = select(User.vip).where(User.telegram_id == telegram_id)
@@ -33,3 +47,5 @@ def set_vip(telegram_id) -> None:
     session.execute(update_query)
     session.commit()
     loguru.logger.debug("Vip статус установлен!")
+
+# endregion
