@@ -3,10 +3,10 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from .main_database import *
+from .main_database import Database
 
 
-class User(Database.Base):
+class User(Database.BASE):
     __tablename__ = 'USER'
     id = Column(Integer, primary_key=True)
     telegram_id = Column(Integer, nullable=False)
@@ -14,7 +14,7 @@ class User(Database.Base):
     session = relationship('Session', uselist=False, backref="USER")
 
 
-class Session(Database.Base):
+class Session(Database.BASE):
     __tablename__ = 'SESSION'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('USER.id'), unique=True)
@@ -22,4 +22,4 @@ class Session(Database.Base):
 
 
 def register_models():
-    Database.Base.metadata.create_all(Database().engine)
+    Database.BASE.metadata.create_all(Database().engine)

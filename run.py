@@ -1,6 +1,4 @@
 #!/usr/bin/python
-import subprocess
-import sys
 
 from telegram_bot import start_telegram_bot
 

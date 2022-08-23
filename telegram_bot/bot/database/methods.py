@@ -17,6 +17,12 @@ def create_user(telegram_id: int) -> None:
     loguru.logger.debug(f"Добавлен новый юзер! Telegram-id - {telegram_id}")
 
 
+def create_user_bot_session(user: User, user_bot_session: str):
+    session = Database().session
+    session.add(Session(user_id=user.id, session=user_bot_session))
+    session.commit()
+
+
 def get_user_by_id_telegram_id(telegram_id: int) -> User | None:
     try:
         return Database().session.query(User).filter(User.telegram_id == telegram_id).one()
@@ -24,10 +30,6 @@ def get_user_by_id_telegram_id(telegram_id: int) -> User | None:
         return None
 
 
-def create_user_bot_session(user: User, user_bot_session: str):
-    session = Database().session
-    session.add(Session(user_id=user.id, session=user_bot_session))
-    session.commit()
 
 
 # region Vip

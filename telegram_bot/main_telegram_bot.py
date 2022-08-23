@@ -13,7 +13,7 @@ def register_all_handlers(dp: Dispatcher) -> None:
     register_other_handlers(dp)
 
 
-def start_telegram_bot():
+def start_telegram_bot() -> None:
     bot = Bot(token=TgBot.TOKEN, parse_mode='HTML')
     dp = Dispatcher(bot, storage=MemoryStorage())
     register_models()

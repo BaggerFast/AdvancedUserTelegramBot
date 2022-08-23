@@ -8,7 +8,7 @@ from misc import SingletonMeta
 
 
 class Database(metaclass=SingletonMeta):
-    Base: Final = declarative_base()
+    BASE: Final = declarative_base()
 
     def __init__(self):
         self.__engine = create_engine('sqlite:///database.db')

@@ -1,13 +1,14 @@
 # Telegram
-Telethon
-aiogram
+Pyrogram~=2.0.41
+aiogram~=2.22.1
+
 
 # Database
-SQLAlchemy
+SQLAlchemy~=1.4.40
 
 # Debug
 pylint
-loguru
+loguru~=0.6.0
 
 # Other
 asyncio

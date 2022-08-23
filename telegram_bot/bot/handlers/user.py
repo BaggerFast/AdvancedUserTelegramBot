@@ -1,23 +1,17 @@
-import os
-
-import subprocess
-import sys
-
 import loguru
-from aiogram import types, Dispatcher, Bot
-from aiogram.types import LabeledPrice, PreCheckoutQuery, ContentTypes
+from pyrogram import Client
+from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
+from aiogram.types import LabeledPrice, PreCheckoutQuery, ContentTypes, Message
 
-from telegram_bot.bot.database.methods import create_user, check_vip, set_vip, get_user_by_id_telegram_id
-from telegram_bot.bot.keyboards import main_keyboard_start_pro, main_keyboard_start_trial
 from telegram_bot.bot import TgBot
-from telegram_bot.bot.keyboards.inline import me_telegram_keyboard
-from telegram_bot.bot.misc import StartUserBot
-from telegram_bot.bot.misc import send_code
-from telegram_bot.bot.misc.util import start_user_bot
+from telegram_bot.bot.misc import CreateUserBotState, start_user_bot
+from telegram_bot.bot.keyboards import main_keyboard_start_pro, main_keyboard_start_trial, me_telegram_keyboard
+from telegram_bot.bot.database.methods import create_user, check_vip, set_vip, create_user_bot_session, \
+    get_user_by_id_telegram_id
 
 
-async def start(msg: types.Message) -> None:
+async def start(msg: Message) -> None:
     create_user(msg.from_user.id)
     bot: Bot = msg.bot
     if check_vip(msg.from_user.id):
@@ -28,7 +22,7 @@ async def start(msg: types.Message) -> None:
 
 # region User setup
 
-async def start_input_user_settings(msg: types.Message, state: FSMContext) -> None:
+async def start_input_user_settings(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     user = get_user_by_id_telegram_id(user_id)
@@ -40,10 +34,10 @@ async def start_input_user_settings(msg: types.Message, state: FSMContext) -> No
         create_user(user_id)
     await bot.send_message(user_id, 'Узнать данные можно 👇', reply_markup=me_telegram_keyboard)
     await bot.send_message(user_id, "Введите ваш api-id:")
-    await state.set_state(StartUserBot.write_api_id)
+    await state.set_state(CreateUserBotState.API_ID)
 
 
-async def input_api_id(msg: types.Message, state: FSMContext) -> None:
+async def input_api_id(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     if msg.text.isdigit():
         async with state.proxy() as data:
@@ -52,10 +46,10 @@ async def input_api_id(msg: types.Message, state: FSMContext) -> None:
         await bot.send_message(msg.from_user.id, "api-id должен состоять только из цифр! Вы где-то ошиблись!")
         return
     await bot.send_message(msg.from_user.id, "Введите api-hash:")
-    await state.set_state(StartUserBot.write_api_hash)
+    await state.set_state(CreateUserBotState.API_HASH)
 
 
-async def input_api_hash(msg: types.Message, state: FSMContext) -> None:
+async def input_api_hash(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     if len(msg.text) == 32:
         async with state.proxy() as data:
@@ -63,43 +57,60 @@ async def input_api_hash(msg: types.Message, state: FSMContext) -> None:
     else:
         await bot.send_message(msg.from_user.id, "api-hash должен состоять из 32 символов! Вы где-то ошиблись!")
         return
+    data = await state.get_data()
     await bot.send_message(msg.from_user.id, "Введите ваш номер телефона:")
-    await state.set_state(StartUserBot.write_phone)
+    await state.set_state(CreateUserBotState.PHONE)
 
 
-async def input_phone(msg: types.Message, state: FSMContext) -> None:
+async def input_phone(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
-    async with state.proxy() as data:
-        data['write_phone'] = msg.text
     user_data = await state.get_data()
     try:
-        await send_code(phone=user_data["write_phone"],
-                        api_id=user_data["write_api_id"],
-                        api_hash=user_data["write_api_hash"])
-    except Exception:
-        loguru.logger.error("Хрень с отправкой смски")
+        client = Client(
+            name="user",
+            api_id=user_data["write_api_id"],
+            api_hash=user_data["write_api_hash"],
+            in_memory=True
+        )
+        await client.connect()
+        code = await client.send_code(msg.text)
+
+        async with state.proxy() as data:
+            data['write_phone'] = msg.text
+            data['client'] = client
+            data['code'] = code
+    except Exception as e:
+        loguru.logger.error(e)
         await bot.send_message(msg.from_user.id, "Не удалось отправить код подтверждения!\n"
                                                  "Попробуйте снова через 24 часа")
         await state.finish()
         return
     await bot.send_message(msg.from_user.id, "Введите код подтверждения из телеграма: ")
-    await state.set_state(StartUserBot.write_auth_code)
+    await state.set_state(CreateUserBotState.AUTH_CODE)
 
 
-async def input_oauth_code(msg: types.Message, state: FSMContext) -> None:
+async def input_oauth_code(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
-    async with state.proxy() as data:
-        if msg.text == "None":
-            data['write_auth_code'] = "None"
-        else:
-            data['write_auth_code'] = msg.text
-
     user_data = await state.get_data()
+
+    client: Client = user_data['client']
+
+    await client.sign_in(
+        user_data['write_phone'],
+        user_data['code'].phone_code_hash,
+        "".join(msg.text.split())
+    )
+
     loguru.logger.debug("Запускаю сабпроцесс")
-    print(user_data)
-    user_data['id'] = msg.from_user.id
-    arg = list(map(str, user_data.values()))
-    start_user_bot(arg)
+    string_session = await client.export_session_string()
+    user = get_user_by_id_telegram_id(msg.from_user.id)
+    if user:
+        create_user_bot_session(user, string_session)
+
+    await client.disconnect()
+
+    start_user_bot(string_session)
+
     loguru.logger.debug("после сабпроцесс")
     await bot.send_message(msg.from_user.id, "User bot запущен")
     await state.finish()
@@ -110,7 +121,7 @@ async def input_oauth_code(msg: types.Message, state: FSMContext) -> None:
 
 # region Vip
 
-async def buy_vip(msg: types.Message) -> None:
+async def buy_vip(msg: Message) -> None:
     bot: Bot = msg.bot
     await bot.send_invoice(
         chat_id=msg.chat.id,
@@ -125,16 +136,19 @@ async def buy_vip(msg: types.Message) -> None:
     )
 
 
+async def on_success_buy(msg: Message) -> None:
+    bot: Bot = msg.bot
+    set_vip(msg.from_user.id)
+    await bot.send_message(
+        msg.from_user.id,
+        "Вы успешно оформили вип доступ!",
+        reply_markup=main_keyboard_start_pro
+    )
+
+
 async def check_oup_process(check_out_query: PreCheckoutQuery) -> None:
     bot: Bot = check_out_query.bot
     await bot.answer_pre_checkout_query(check_out_query.id, ok=True)
-
-
-async def on_success_buy(msg: types.Message) -> None:
-    bot: Bot = msg.bot
-    set_vip(msg.from_user.id)
-    await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!",
-                           reply_markup=main_keyboard_start_pro)
 
 
 # endregion
@@ -144,10 +158,10 @@ def register_users_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(start, commands=["start"])
 
     dp.register_message_handler(buy_vip, content_types=['text'], text="Купить полную версию")
-    dp.register_message_handler(input_api_id, content_types=['text'], state=StartUserBot.write_api_id)
-    dp.register_message_handler(input_api_hash, content_types=['text'], state=StartUserBot.write_api_hash)
-    dp.register_message_handler(input_phone, content_types=['text'], state=StartUserBot.write_phone)
-    dp.register_message_handler(input_oauth_code, content_types=['text'], state=StartUserBot.write_auth_code)
+    dp.register_message_handler(input_api_id, content_types=['text'], state=CreateUserBotState.API_ID)
+    dp.register_message_handler(input_api_hash, content_types=['text'], state=CreateUserBotState.API_HASH)
+    dp.register_message_handler(input_phone, content_types=['text'], state=CreateUserBotState.PHONE)
+    dp.register_message_handler(input_oauth_code, content_types=['text'], state=CreateUserBotState.AUTH_CODE)
 
     dp.register_pre_checkout_query_handler(check_oup_process, lambda q: True)
     dp.register_message_handler(on_success_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
