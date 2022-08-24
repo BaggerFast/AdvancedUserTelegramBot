@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
 import sys
+
 import loguru
-from pyrogram import Client
+from pyrogram import Client, filters, types
+from pyrogram.handlers import MessageHandler
+
+from commands import stupid
 
 
 def main():
@@ -14,6 +18,7 @@ def main():
         session_string=string_session,
         in_memory=True,
     )
+    client.add_handler(MessageHandler(stupid, filters=(filters.me and filters.command("stupid", "."))))
     client.run()
 
 

@@ -1,5 +1,8 @@
+import datetime
+
 import loguru
 from pyrogram import Client
+from pyrogram.errors import FloodWait, PhoneCodeInvalid, SessionPasswordNeeded
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import LabeledPrice, PreCheckoutQuery, ContentTypes, Message
@@ -9,6 +12,8 @@ from telegram_bot.bot.misc import CreateUserBotState, start_user_bot
 from telegram_bot.bot.keyboards import main_keyboard_start_pro, main_keyboard_start_trial, me_telegram_keyboard
 from telegram_bot.bot.database.methods import create_user, check_vip, set_vip, create_user_bot_session, \
     get_user_by_id_telegram_id
+
+sessions = {}
 
 
 async def start(msg: Message) -> None:
@@ -28,8 +33,10 @@ async def start_input_user_settings(msg: Message, state: FSMContext) -> None:
     user = get_user_by_id_telegram_id(user_id)
     if user:
         if user.session:
-            start_user_bot(user.session)
+            start_user_bot(user.session.session, msg.from_user.id)
             await state.finish()
+            await bot.send_message(msg.from_user.id, "Ваш прошлый сеанс ещё активен!")
+            return
     else:
         create_user(user_id)
     await bot.send_message(user_id, 'Узнать данные можно 👇', reply_markup=me_telegram_keyboard)
@@ -57,7 +64,6 @@ async def input_api_hash(msg: Message, state: FSMContext) -> None:
     else:
         await bot.send_message(msg.from_user.id, "api-hash должен состоять из 32 символов! Вы где-то ошиблись!")
         return
-    data = await state.get_data()
     await bot.send_message(msg.from_user.id, "Введите ваш номер телефона:")
     await state.set_state(CreateUserBotState.PHONE)
 
@@ -67,7 +73,7 @@ async def input_phone(msg: Message, state: FSMContext) -> None:
     user_data = await state.get_data()
     try:
         client = Client(
-            name="user",
+            name=str(msg.from_user.id),
             api_id=user_data["write_api_id"],
             api_hash=user_data["write_api_hash"],
             in_memory=True
@@ -77,12 +83,12 @@ async def input_phone(msg: Message, state: FSMContext) -> None:
 
         async with state.proxy() as data:
             data['write_phone'] = msg.text
-            data['client'] = client
             data['code'] = code
-    except Exception as e:
-        loguru.logger.error(e)
-        await bot.send_message(msg.from_user.id, "Не удалось отправить код подтверждения!\n"
-                                                 "Попробуйте снова через 24 часа")
+            sessions[msg.from_user.id] = client
+    except FloodWait as waitE:
+        loguru.logger.error(waitE)
+        await bot.send_message(msg.from_user.id, f"Не удалось отправить смс!\n"
+                                                 f"Повторите попытку через - {datetime.timedelta(seconds=waitE.value)}")
         await state.finish()
         return
     await bot.send_message(msg.from_user.id, "Введите код подтверждения из телеграма: ")
@@ -93,14 +99,25 @@ async def input_oauth_code(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_data = await state.get_data()
 
-    client: Client = user_data['client']
-
-    await client.sign_in(
-        user_data['write_phone'],
-        user_data['code'].phone_code_hash,
-        "".join(msg.text.split())
-    )
-
+    client: Client = sessions[msg.from_user.id]
+    del(sessions[msg.from_user.id])
+    try:
+        await client.sign_in(
+            user_data['write_phone'],
+            user_data['code'].phone_code_hash,
+            "".join(msg.text.split())
+        )
+    except PhoneCodeInvalid as code_exception:
+        loguru.logger.error(code_exception)
+        await bot.send_message(msg.from_user.id,
+                               "Неверный код!\n"
+                               "Повторите авторизацию заново")
+        return
+    except SessionPasswordNeeded:
+        await bot.send_message(msg.from_user.id, "У вас включена двух этапная аунтефикация.\n"
+                                                 "Выключите её чтобы пользоваться ботом!")
+        await state.finish()
+        return
     loguru.logger.debug("Запускаю сабпроцесс")
     string_session = await client.export_session_string()
     user = get_user_by_id_telegram_id(msg.from_user.id)
@@ -109,9 +126,10 @@ async def input_oauth_code(msg: Message, state: FSMContext) -> None:
 
     await client.disconnect()
 
-    start_user_bot(string_session)
+    start_user_bot(string_session, msg.from_user.id)
 
     loguru.logger.debug("после сабпроцесс")
+
     await bot.send_message(msg.from_user.id, "User bot запущен")
     await state.finish()
 
