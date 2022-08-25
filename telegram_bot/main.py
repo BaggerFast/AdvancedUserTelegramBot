@@ -4,10 +4,8 @@ from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.exceptions import ChatNotFound
 from loguru import logger
-from sqlalchemy import select
 
-from telegram_bot.bot.database.main_database import Database
-from telegram_bot.bot.database.models import User
+from telegram_bot.bot.database.methods import get_users_with_sessions
 from .bot import TgBot
 from .bot.database import register_models
 from .bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers
@@ -15,16 +13,18 @@ from .bot.handlers import register_users_handlers, register_admin_handlers, regi
 
 async def __on_start_up(dp: Dispatcher):
     logger.info('Bot starts')
+
     register_models()
     __register_all_handlers(dp)
-
-    # todo better
-    select_query = select(User.telegram_id).where(User.session)
-    users_tg_id = Database().session.execute(select_query).fetchone()
+    users_tg_id = get_users_with_sessions()
     count = 0
+    logger.debug(users_tg_id)
+    if not users_tg_id:
+        logger.info("В базе никого нет, я хочу плакать. У меня дипрессия и мне одиноко!")
+        return
     for tg_id in users_tg_id:
         with suppress(ChatNotFound):
-            await dp.bot.send_message(tg_id, "Бот обновлен и перезапущен, перезапустите сессию")
+            await dp.bot.send_message(tg_id[0], "Бот обновлен и перезапущен, перезапустите сессию")
             count += 1
     logger.info(f"Было совершено {count} рассылок")
 

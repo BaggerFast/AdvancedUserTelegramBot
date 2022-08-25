@@ -50,4 +50,12 @@ def set_vip(telegram_id) -> None:
     session.commit()
     logger.debug("Vip статус установлен!")
 
+
+def get_users_with_sessions():
+    select_query = select(User.telegram_id).where(User.session)
+    result = Database().session.execute(select_query).fetchall()
+    if not result:
+        return None
+    else:
+        return result
 # endregion

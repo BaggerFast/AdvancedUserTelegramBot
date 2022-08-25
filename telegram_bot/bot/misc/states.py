@@ -8,3 +8,4 @@ class CreateUserBotState(StatesGroup):
     API_HASH: Final = State()
     PHONE: Final = State()
     AUTH_CODE: Final = State()
+    TWO_FA_PASSWORD: Final = State()
