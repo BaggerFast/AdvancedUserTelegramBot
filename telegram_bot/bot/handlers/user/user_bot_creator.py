@@ -1,14 +1,15 @@
+from datetime import timedelta
 from loguru import logger
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 from pyrogram import Client
-from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait
+from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneNumberInvalid, PhoneCodeExpired, \
+    ApiIdInvalid, PasswordHashInvalid
 
 from telegram_bot.bot.database.methods import create_user_bot_session, get_user_by_id_telegram_id, create_user
 from telegram_bot.bot.keyboards import me_telegram_keyboard
 from telegram_bot.bot.misc import CreateUserBotState, start_user_bot
-from datetime import timedelta
 
 __sessions = {}
 
@@ -19,7 +20,7 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
     user = get_user_by_id_telegram_id(user_id)
     if user:
         if user.session:
-            start_user_bot(user.session.session, msg.from_user.id)
+            start_user_bot(user.session.session, msg.from_user.id, user.vip)
             await state.finish()
             await bot.send_message(msg.from_user.id, "Ваш прошлый сеанс ещё активен!")
             return
@@ -58,20 +59,29 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_data = await state.get_data()
 
-    client = Client(
-        name=str(msg.from_user.id),
-        api_id=user_data["write_api_id"],
-        api_hash=user_data["write_api_hash"],
-        in_memory=True
-    )
-    await client.connect()
-
+    try:
+        client = Client(
+            name=str(msg.from_user.id),
+            api_id=user_data["write_api_id"],
+            api_hash=user_data["write_api_hash"],
+            in_memory=True
+        )
+        await client.connect()
+    except (ApiIdInvalid, PasswordHashInvalid) as e:
+        logger.error(e)
+        await bot.send_message(msg.from_user.id, "Введены не правильные ключи доступа. Начните все заново")
+        await state.finish()
+        return
     try:
         code = await client.send_code(msg.text)
-    except FloodWait as waitE:
-        logger.error(waitE)
+    except PhoneNumberInvalid as e:
+        logger.error(e)
+        await bot.send_message(msg.from_user.id, "Введен не правильный номер телефона.\nПовторите попытку!")
+        return
+    except FloodWait as e:
+        logger.error(e)
         await bot.send_message(msg.from_user.id, f"Не удалось отправить смс!\n"
-                                                 f"Повторите попытку через - {timedelta(seconds=waitE.value)}")
+                                                 f"Повторите попытку через - {timedelta(seconds=e.value)}")
         await state.finish()
         return
 
@@ -105,9 +115,12 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
     except PhoneCodeInvalid as e:
         logger.error(e)
         # todo: it can be bug
-        await bot.send_message(msg.from_user.id,
-                               "Неверный код!\n"
-                               "Повторите авторизацию заново")
+        await bot.send_message(msg.from_user.id, "Неверный код!\nПовторите авторизацию заново")
+        return
+    except PhoneCodeExpired as e:
+        logger.error(e)
+        await bot.send_message(msg.from_user.id, "Код подтверждения иссек, попробуйте заново")
+        await state.finish()
         return
     except SessionPasswordNeeded as e:
         logger.error(e)
@@ -123,7 +136,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
 
     await client.disconnect()
 
-    start_user_bot(string_session, msg.from_user.id)
+    start_user_bot(string_session, msg.from_user.id, user.vip)
 
     await bot.send_message(msg.from_user.id, "User bot запущен")
     await state.finish()

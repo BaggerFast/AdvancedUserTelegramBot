@@ -7,7 +7,7 @@ from loguru import logger
 from sqlalchemy import select
 
 from telegram_bot.bot.database.main_database import Database
-from telegram_bot.bot.database.models import Session, User
+from telegram_bot.bot.database.models import User
 from .bot import TgBot
 from .bot.database import register_models
 from .bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers

@@ -40,6 +40,3 @@ def _register_vip_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию")
     dp.register_message_handler(__on_success_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
     dp.register_pre_checkout_query_handler(__check_oup_process, lambda _: True)
-
-
-
