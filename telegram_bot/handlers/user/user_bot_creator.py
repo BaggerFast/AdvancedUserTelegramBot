@@ -2,7 +2,7 @@ from subprocess import Popen
 from datetime import timedelta
 
 from loguru import logger
-from aiogram import Dispatcher, Bot
+from aiogram import Dispatcher, Bot, types
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 from pyrogram import Client
@@ -12,27 +12,33 @@ from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, 
 from telegram_bot.database.methods import create_user_bot_session, get_user_by_id_telegram_id, create_user, \
     check_vip
 from telegram_bot.keyboards import me_telegram_keyboard
-from telegram_bot.keyboards import main_keyboard_pro_bot_started, main_keyboard_trial_bot_started
+from telegram_bot.keyboards import main_keyboard_pro_bot_started, main_keyboard_trial_bot_started, \
+    main_keyboard_start_trial, main_keyboard_start_pro
 from telegram_bot.misc import CreateUserBotState, start_user_bot
 
 __sessions: dict[int, Client] = {}
-__process: dict[int, Popen] = {}
+_process: dict[int, Popen] = {}
 
 
 async def __stop_bot(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
-    if user_id in __process:
-        __process[msg.from_user.id].kill()
-        del (__process[msg.from_user.id])
-    await bot.send_message(msg.from_user.id, "User bot остановлен!")
+    if user_id in _process:
+        _process[msg.from_user.id].kill()
+        del (_process[msg.from_user.id])
+        if check_vip(user_id):
+            await bot.send_message(user_id, "User bot остановлен!",
+                                   reply_markup=main_keyboard_start_pro)
+        else:
+            await bot.send_message(user_id, "User bot остановлен!",
+                                   reply_markup=main_keyboard_start_trial)
 
 
 async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     user = get_user_by_id_telegram_id(user_id)
-    if user_id in __process:
+    if user_id in _process:
         if check_vip(user_id):
             await bot.send_message(user_id, "Ваш бот уже запущен!", reply_markup=main_keyboard_pro_bot_started)
         else:
@@ -41,14 +47,20 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
     if user:
         if user.session:
             process = start_user_bot(user.session.session, msg.from_user.id, user.vip)
-            __process[user_id] = process
+            _process[user_id] = process
             await state.finish()
-            await bot.send_message(msg.from_user.id, "Ваш прошлый сеанс ещё активен!")
+            if check_vip(user_id):
+                await bot.send_message(user_id, "Вы уже авторизированы!",
+                                       reply_markup=main_keyboard_pro_bot_started)
+            else:
+                await bot.send_message(user_id, "Вы уже авторизированы!",
+                                       reply_markup=main_keyboard_trial_bot_started)
             return
     else:
         create_user(user_id)
-    await bot.send_message(user_id, 'Узнать данные можно 👇', reply_markup=me_telegram_keyboard)
-    await bot.send_message(user_id, "Введите ваш api-id:")
+    await bot.send_message(user_id, "Если вы решите отменить авторизацию напишите - /cancel")
+    await bot.send_message(user_id, 'Узнать данные можно тут👇', reply_markup=me_telegram_keyboard)
+    await bot.send_message(user_id, "Введите ваш api-id:", reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(CreateUserBotState.API_ID)
 
 
@@ -155,7 +167,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
     await client.disconnect()
 
     start_user_bot(string_session, msg.from_user.id, user.vip)
-    __process[user_id] = start_user_bot(string_session, user_id, user.vip)
+    _process[user_id] = start_user_bot(string_session, user_id, user.vip)
     del (__sessions[user_id])
 
     if check_vip(msg.from_user.id):
@@ -183,7 +195,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
 
     await client.disconnect()
 
-    __process[user_id] = start_user_bot(string_session, user_id, user.vip)
+    _process[user_id] = start_user_bot(string_session, user_id, user.vip)
     del (__sessions[user_id])
 
     # todo: replace to utils.py

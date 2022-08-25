@@ -1,4 +1,5 @@
 import asyncio
+
 from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
@@ -59,7 +60,8 @@ async def kill(app, message: Message):
     await asyncio.sleep(time)
     await message.edit(f"<b>👀 Поиск...</b>")
     await asyncio.sleep(time)
-
+    await message.edit('<b>By userbot</b> - <a href="https://t.me/Gosha_developer_bot">Ссылка</a>')
+    await message.delete(revoke=False)
 
 async def night(app, message: Message):
     time = 0.5
@@ -92,6 +94,8 @@ async def night(app, message: Message):
     await message.edit(f'<b>💛 сильно 💛</b>')
     await asyncio.sleep(time)
     await message.edit(f'<b>💜 люблю 💜</b>')
+    await message.edit('<b>By userbot</b> - <a href="https://t.me/Gosha_developer_bot">Ссылка</a>')
+    await message.delete(revoke=False)
 
 
 def get_common_handlers() -> list[MessageHandler]:
