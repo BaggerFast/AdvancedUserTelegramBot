@@ -1,6 +1,7 @@
 import sys
-import subprocess
+from subprocess import Popen
+from misc.path import PathManager
 
 
 def start_user_bot(string_session: str, telegram_id: int):
-    subprocess.Popen([sys.executable, "user_bot/main_user_bot.py", string_session, str(telegram_id)])
+    Popen([sys.executable, PathManager.get("user_bot/main.py"), string_session, f'{telegram_id}'])

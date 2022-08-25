@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 from telegram_bot import start_telegram_bot
 
 

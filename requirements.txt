@@ -12,3 +12,5 @@ loguru~=0.6.0
 
 # Other
 asyncio
+tgcrypto
+# uvloop
