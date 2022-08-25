@@ -1,1 +1,1 @@
-from .config import TgBot
+from .env import TgBot

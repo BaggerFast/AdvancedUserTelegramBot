@@ -1,35 +1,27 @@
 #!/usr/bin/python
 import sys
-from pyrogram import Client, filters
-from pyrogram.handlers import MessageHandler
-from commands import stupid, bombs, kill, night
+from pyrogram import Client
+from user_bot.handlers import get_common_handlers, get_vip_handlers
+
+
+def __register_all_handlers(client: Client, vip: bool) -> None:
+    handlers = []
+    handlers.extend(get_common_handlers())
+    handlers.extend(get_vip_handlers(vip))
+    for handler in handlers:
+        client.add_handler(handler)
 
 
 def main():
     string_session = sys.argv[1]
     telegram_id = sys.argv[2]
-    vip_status = int(sys.argv[3])
-
+    vip_status = bool(int(sys.argv[3]))
     client = Client(
         name=telegram_id,
         session_string=string_session,
         in_memory=True,
     )
-    handlers = (
-        MessageHandler(stupid, filters=(filters.me and filters.command("stupid", "."))),
-        MessageHandler(bombs, filters=(filters.me and filters.command("bombs", "."))),
-        MessageHandler(kill, filters=(filters.me and filters.command("kill", "."))),
-        MessageHandler(night, filters=(filters.me and filters.command("filter", "."))),
-    )
-
-    for handler in handlers:
-        client.add_handler(handler)
-
-    if vip_status:
-        vip_handlers = ()
-        for handler in vip_handlers:
-            client.add_handler(handler)
-
+    __register_all_handlers(client, vip_status)
     client.run()
 
 
