@@ -39,7 +39,7 @@ async def stupid(app: Client, message: Message):
     await message.delete(revoke=False)
 
 
-def get_vip_handlers(vip: bool):
+def get_vip_handlers(vip: bool) -> list[MessageHandler]:
     if not vip:
         return []
     return [

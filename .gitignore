@@ -161,5 +161,5 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 static/
-telegram_bot/bot/database/FileDatabase/Database.db
+telegram_bot/database/FileDatabase/Database.db
 Database.db

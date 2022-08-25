@@ -5,17 +5,18 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.exceptions import ChatNotFound
 from loguru import logger
 
-from telegram_bot.bot.database.methods import get_users_with_sessions
-from .bot import TgBot
-from .bot.database import register_models
-from .bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers
+from telegram_bot.database.methods import get_users_with_sessions
+from telegram_bot.env import TgBot
+from telegram_bot.database import register_models
+from telegram_bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers
 
 
-async def __on_start_up(dp: Dispatcher):
+async def __on_start_up(dp: Dispatcher) -> None:
     logger.info('Bot starts')
 
     register_models()
     __register_all_handlers(dp)
+
     users_tg_id = get_users_with_sessions()
     count = 0
     logger.debug(users_tg_id)

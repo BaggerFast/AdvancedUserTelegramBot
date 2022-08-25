@@ -1,9 +1,9 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import PreCheckoutQuery, ContentTypes, Message, LabeledPrice
 
-from telegram_bot.bot import TgBot
-from telegram_bot.bot.database.methods import set_vip
-from telegram_bot.bot.keyboards import main_keyboard_start_pro
+from telegram_bot.env import TgBot
+from telegram_bot.database.methods import set_vip
+from telegram_bot.keyboards import main_keyboard_start_pro
 
 
 async def __buy_vip(msg: Message) -> None:

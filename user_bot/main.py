@@ -12,6 +12,9 @@ def __register_all_handlers(client: Client, vip: bool) -> None:
         client.add_handler(handler)
 
 
+data = {}
+
+
 def main():
     string_session = sys.argv[1]
     telegram_id = sys.argv[2]
