@@ -4,7 +4,11 @@ from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
+from user_bot.constants import _VIP_STATUS
+from .advertising_decorator import advert
 
+
+@advert(_VIP_STATUS)
 async def bombs(app: Client, message: Message):
     row = '▪️▪️▪️▪️\n'
     bombs = '💣 💣 💣 💣\n'
@@ -30,6 +34,7 @@ async def bombs(app: Client, message: Message):
     await message.edit_text(f"{row}{row}{row}{row}{smile}")
 
 
+@advert(_VIP_STATUS)
 async def kill(app, message: Message):
     time = 0.1
     await message.edit(f"<b>🔪 На тебя заказали убийство.</b>")  # red
@@ -60,9 +65,9 @@ async def kill(app, message: Message):
     await asyncio.sleep(time)
     await message.edit(f"<b>👀 Поиск...</b>")
     await asyncio.sleep(time)
-    await message.edit('<b>By userbot</b> - <a href="https://t.me/Gosha_developer_bot">Ссылка</a>')
-    await message.delete(revoke=False)
 
+
+@advert(_VIP_STATUS)
 async def night(app, message: Message):
     time = 0.5
     await message.edit(f'<b>спокойной ночи зайка 💚</b>')
@@ -94,8 +99,6 @@ async def night(app, message: Message):
     await message.edit(f'<b>💛 сильно 💛</b>')
     await asyncio.sleep(time)
     await message.edit(f'<b>💜 люблю 💜</b>')
-    await message.edit('<b>By userbot</b> - <a href="https://t.me/Gosha_developer_bot">Ссылка</a>')
-    await message.delete(revoke=False)
 
 
 def get_common_handlers() -> list[MessageHandler]:

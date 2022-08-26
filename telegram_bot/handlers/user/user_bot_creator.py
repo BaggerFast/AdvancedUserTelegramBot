@@ -50,10 +50,12 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
             _process[user_id] = process
             await state.finish()
             if check_vip(user_id):
-                await bot.send_message(user_id, "Вы уже авторизированы!",
+                await bot.send_message(user_id, "Бот запущен.\n"
+                                                "Вам не надо проходить авторизацию, так как в базе уже есть ваши данные",
                                        reply_markup=main_keyboard_pro_bot_started)
             else:
-                await bot.send_message(user_id, "Вы уже авторизированы!",
+                await bot.send_message(user_id, "Бот запущен.\n"
+                                                "Вам не надо проходить авторизацию, так как в базе уже есть ваши данные",
                                        reply_markup=main_keyboard_trial_bot_started)
             return
     else:
