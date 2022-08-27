@@ -48,5 +48,6 @@ def start_telegram_bot() -> None:
     dp = Dispatcher(bot, storage=MemoryStorage())
     executor.start_polling(dp, skip_updates=True, on_startup=__on_start_up)
 
+
 if __name__ == "__main__":
     start_telegram_bot()
