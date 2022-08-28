@@ -1,8 +1,9 @@
 import asyncio
-
-from pyrogram import Client, filters
+from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
+from user_bot.misc.constants import VIP_STATUS
+from user_bot.misc.util import get_me_filters
 
 
 async def stupid(app: Client, message: Message):
@@ -38,9 +39,9 @@ async def stupid(app: Client, message: Message):
     await asyncio.sleep(1)
 
 
-def get_vip_handlers(vip: bool) -> list[MessageHandler]:
-    if not vip:
+def get_vip_handlers() -> list[MessageHandler]:
+    if not VIP_STATUS:
         return []
     return [
-        MessageHandler(stupid, filters=(filters.me and filters.command("stupid", "."))),
+        MessageHandler(stupid, filters=get_me_filters("stupid"))
     ]

@@ -1,21 +1,15 @@
 #!/usr/bin/python
 import sys
-
 from pyrogram import Client
-
 from user_bot.handlers import get_common_handlers, get_vip_handlers
-from constants import _VIP_STATUS
 
-def __register_all_handlers(client: Client, vip: bool) -> None:
+
+def __register_all_handlers(client: Client) -> None:
     handlers = []
     handlers.extend(get_common_handlers())
-    handlers.extend(get_vip_handlers(vip))
+    handlers.extend(get_vip_handlers())
     for handler in handlers:
         client.add_handler(handler)
-
-
-data = {}
-
 
 
 def main():
@@ -26,7 +20,7 @@ def main():
         session_string=string_session,
         in_memory=True,
     )
-    __register_all_handlers(client, _VIP_STATUS)
+    __register_all_handlers(client)
     client.run()
 
 

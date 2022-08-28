@@ -1,40 +1,14 @@
 import asyncio
 
-from pyrogram import Client, filters
+from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
-from user_bot.constants import _VIP_STATUS
-from .advertising_decorator import advert
+from user_bot.handlers.advertising_decorator import advert
+from user_bot.misc.util import get_me_filters
 
 
-@advert(_VIP_STATUS)
-async def bombs(app: Client, message: Message):
-    row = '▪️▪️▪️▪️\n'
-    bombs = '💣 💣 💣 💣\n'
-    fire = '💥 💥 💥 💥\n'
-    smile = '😵 😵 😵 😵\n'
-    speed = 0.1
-    await message.edit_text(f"{row}{row}{row}{row}{row}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{bombs}{row}{row}{row}{row}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{row}{bombs}{row}{row}{row}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{row}{row}{bombs}{row}{row}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{row}{row}{row}{bombs}{row}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{row}{row}{row}{row}{bombs}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{row}{row}{row}{row}{fire}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{row}{row}{row}{fire}{fire}")
-    await asyncio.sleep(speed)
-    await message.edit_text(f"{row}{row}{row}{row}{smile}")
-
-
-@advert(_VIP_STATUS)
+@advert
 async def kill(app, message: Message):
     time = 0.1
     await message.edit(f"<b>🔪 На тебя заказали убийство.</b>")  # red
@@ -67,7 +41,7 @@ async def kill(app, message: Message):
     await asyncio.sleep(time)
 
 
-@advert(_VIP_STATUS)
+@advert
 async def night(app, message: Message):
     time = 0.5
     await message.edit(f'<b>спокойной ночи зайка 💚</b>')
@@ -101,9 +75,36 @@ async def night(app, message: Message):
     await message.edit(f'<b>💜 люблю 💜</b>')
 
 
+@advert
+async def bombs(app: Client, message: Message):
+    row = '▪️▪️▪️▪️\n'
+    bombs = '💣 💣 💣 💣\n'
+    fire = '💥 💥 💥 💥\n'
+    smile = '😵 😵 😵 😵\n'
+    speed = 0.1
+    await message.edit_text(f"{row}{row}{row}{row}{row}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{bombs}{row}{row}{row}{row}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{row}{bombs}{row}{row}{row}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{row}{row}{bombs}{row}{row}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{row}{row}{row}{bombs}{row}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{row}{row}{row}{row}{bombs}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{row}{row}{row}{row}{fire}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{row}{row}{row}{fire}{fire}")
+    await asyncio.sleep(speed)
+    await message.edit_text(f"{row}{row}{row}{row}{smile}")
+
+
 def get_common_handlers() -> list[MessageHandler]:
+
     return [
-        MessageHandler(bombs, filters=(filters.me and filters.command("bombs", "."))),
-        MessageHandler(kill, filters=(filters.me and filters.command("kill", "."))),
-        MessageHandler(night, filters=(filters.me and filters.command("filter", "."))),
+        MessageHandler(bombs, filters=get_me_filters('bombs')),
+        MessageHandler(kill, filters=get_me_filters('kill')),
+        MessageHandler(night, filters=get_me_filters('night')),
     ]
