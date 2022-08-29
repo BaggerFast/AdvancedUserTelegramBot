@@ -22,4 +22,4 @@ jobs:
           pip install -r requirements.txt
           pip install pylint_runner
       - name: Pylint
-        run: pylint_runner
+        run: pylint **/*.py
