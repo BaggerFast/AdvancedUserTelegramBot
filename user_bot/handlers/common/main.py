@@ -1,79 +1,52 @@
-import asyncio
+from asyncio import sleep
+from random import choice, randint
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
-from pyrogram.types import Message
-
 from user_bot.handlers.common.stickers import _get_sticker_handlers
 from user_bot.handlers.common.texts import _get_text_handlers
-from user_bot.misc.util import get_me_filters, cmd
+from user_bot.misc.util import get_me_filters, cmd, play_anim
+from pyrogram.types import Message
 
 
-@cmd()
+@cmd(False)
 async def __kill(app, msg: Message):
-    time = 0.1
-    await msg.edit(f"<b>🔪 На тебя заказали убийство.</b>")  # red
-    await asyncio.sleep(3)
+    await msg.edit("<b>🔪 На тебя заказали убийство.</b>")  # red
+    await sleep(3)
     await msg.edit(f"<b>👀 У тебя есть пару секунд чтобы спрятаться.</b>")  # orange
-    await asyncio.sleep(2)
-    await msg.edit(f"<b>⏳ [ 5s ]</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>⌛ [ 4s ]</b>")  # red
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>⏳ [ 3s ]</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>⌛ [ 2s ]</b>")  # red
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>⏳ [ 1s ]</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>🔪 Убийца вышел на твои поиски, надеюсь ты хорошо спрятался</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>👀 Поиск.</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>👀 Поиск..</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>👀 Поиск...</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>👀 Поиск.</b>")  # orange
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>👀 Поиск..</b>")
-    await asyncio.sleep(time)
-    await msg.edit(f"<b>👀 Поиск...</b>")
-    await asyncio.sleep(time)
+    await sleep(2)
+
+    for i in range(5, 0, -1):
+        await msg.edit(f"<b>⏳ [ {i}s ]</b>")
+        await sleep(1)
+
+    await msg.edit(f"<b>🔪 Убийца вышел на твои поиски, надеюсь ты хорошо спрятался</b>")
+    await sleep(1)
+
+    for i in range(6):
+        await msg.edit(f"<b>👀 Поиск{'.'*(i%3+1)}</b>")
+        await sleep(0.5)
+
+    kill = ["Убийца нашел тебя, к сожалению ты спрятался плохо и был убит",
+            "⚔️Убийца не нашел тебя, вы  очень хорошо спрятались"]
+    await msg.edit(f'<b>{choice(kill)}.</b>')
 
 
-@cmd()
+@cmd(False)
 async def __night(app, msg: Message):
-    time = 0.5
-    await msg.edit(f'<b>спокойной ночи зайка 💚</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи солнышко 💛</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи котёнок ❤</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи цветочек 💙</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи ангелочек 💜</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи принцесса 💓</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи красотка 💕</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи милашка 💖</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи симпатяжка 💗</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>спокойной ночи бусинка 💘</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>❤ я ❤</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>💚 тебя 💚</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>💙 очень 💙</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>💛 сильно 💛</b>')
-    await asyncio.sleep(time)
-    await msg.edit(f'<b>💜 люблю 💜</b>')
+    sleep_words = (
+        'зайка 💚', 'солнышко 💛', 'котёнок ❤', 'цветочек 💙', 'ангелочек 💜', 'принцесса 💓',
+        'красотка 💕', 'милашка 💖', 'симпатяжка 💗', 'бусинка 💘',
+    )
+    love_words = (
+        '❤ я ❤', '💚 тебя 💚', '💙 очень 💙', '💛 сильно 💛', '💜 люблю 💜',
+    )
+    for word in sleep_words:
+        await msg.edit(f'<b>Cпокойной ночи {word}</b>')
+        await sleep(0.5)
+    for word in love_words:
+        await msg.edit(f'<b>{word}</b>')
+        await sleep(0.5)
 
 
 @cmd()
@@ -82,24 +55,78 @@ async def __bombs(app: Client, msg: Message):
     bombs = '💣 💣 💣 💣\n'
     fire = '💥 💥 💥 💥\n'
     smile = '😵 😵 😵 😵\n'
-    speed = 0.1
-    await msg.edit_text(f"{row}{row}{row}{row}{row}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{bombs}{row}{row}{row}{row}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{row}{bombs}{row}{row}{row}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{row}{row}{bombs}{row}{row}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{row}{row}{row}{bombs}{row}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{row}{row}{row}{row}{bombs}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{row}{row}{row}{row}{fire}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{row}{row}{row}{fire}{fire}")
-    await asyncio.sleep(speed)
-    await msg.edit_text(f"{row}{row}{row}{row}{smile}")
+    words = (
+        f"{row}{row}{row}{row}{row}",
+        f"{bombs}{row}{row}{row}{row}",
+        f"{row}{bombs}{row}{row}{row}",
+        f"{row}{row}{bombs}{row}{row}",
+        f"{row}{row}{row}{bombs}{row}",
+        f"{row}{row}{row}{row}{bombs}",
+        f"{row}{row}{row}{row}{fire}",
+        f"{row}{row}{row}{fire}{fire}",
+        f"{row}{row}{row}{row}{smile}"
+    )
+    await play_anim(msg, words)
+
+
+@cmd()
+async def __stupid(app: Client, msg: Message):
+    first_str = 'YOUR BRAIN ➡️ 🧠\n\n🧠'
+    second_str = 'YOUR BRAIN ➡️ 🧠\n\n'
+    words = (
+        f'{first_str}         (^_^)🗑',
+        f'{first_str}       (^_^)  🗑',
+        f'{first_str}     (^_^)    🗑',
+        f'{first_str}   (^_^)      🗑',
+        f'{first_str} (^_^)        🗑',
+        f'{first_str} <(^_^ <)     🗑',
+        f'{second_str}(> ^_^)>🧠   🗑',
+        f'{second_str} (> ^_^)>🧠  🗑',
+        f'{second_str}  (> ^_^)>🧠 🗑',
+        f'{second_str}   (> ^_^)>🧠🗑',
+        f'{second_str}       (^_^) 🗑',
+        f'{second_str}        (3_3)🗑'
+    )
+    await play_anim(msg, words)
+
+
+@cmd(False)
+async def __compli(app: Client, msg: Message):
+    words = (
+        'удивительная', 'внимательная', 'красивая', 'лучшая', 'успешная', 'заботливая', 'милая', 'прекрасная',
+        'умная', 'шикарная', 'обалденная', 'очаровашка', 'любимая', 'весёлая', 'нежная', 'яркая', 'прелестная',
+        'приятная', 'сладкая', 'дивная', 'ангельская', 'добрая', 'бесподобная', 'волшебная', 'крутышка', 'смелая',
+        'ласковая', 'романтичная', 'великолепная', 'внимательная', 'страстная', 'игривая', 'единственная',
+        'стройная', 'безумная', 'симпатичная', 'изящная', 'талантливая', 'элегантная', 'чуткая', 'уникальная',
+    )
+    await msg.edit(f'<b>Крошечные напоминания того, что ты...</b>')
+    await sleep(1)
+
+    for word in words:
+        await msg.edit(f'<b>Cамая {word}</b> ✨')
+        await sleep(0.5)
+    await msg.edit(f'<b>Cамая {choice(words)}</b> ✨')
+
+
+@cmd(False)
+async def __coin(app: Client, msg: Message):
+    loader = (
+        f'{randint(1, 10)}%   █▒▒▒▒▒▒▒▒▒▒▒▒',
+        f'{randint(15, 30)}%  ███▒▒▒▒▒▒▒▒▒▒',
+        f'{randint(30, 40)}%  █████▒▒▒▒▒▒▒▒',
+        f'{randint(45, 55)}%  ███████▒▒▒▒▒▒',
+        f'{randint(60, 75)}%  █████████▒▒▒▒',
+        f'{randint(80, 90)}%  ███████████▒▒',
+        '100% █████████████',
+    )
+    for i in range(1, 4):
+        await msg.edit(f'<b>🪙 Бросаю монетку{"."*i}</b>')
+        await sleep(0.5)
+    for text in loader:
+        await msg.edit(f'{text}')
+        await sleep(0.5)
+    await sleep(1)
+    await msg.edit(f'''<b>Мой вердикт: {choice(('Орел', 'Решка'))}</b>''')
 
 
 def get_common_handlers() -> list[MessageHandler]:
@@ -107,6 +134,9 @@ def get_common_handlers() -> list[MessageHandler]:
         MessageHandler(__bombs, filters=get_me_filters('bombs')),
         MessageHandler(__kill, filters=get_me_filters('kill')),
         MessageHandler(__night, filters=get_me_filters('night')),
+        MessageHandler(__stupid, filters=get_me_filters('stupid')),
+        MessageHandler(__compli, filters=get_me_filters('compli')),
+        MessageHandler(__coin, filters=get_me_filters('coin'))
     ]
     handlers.extend(_get_sticker_handlers())
     handlers.extend(_get_text_handlers())

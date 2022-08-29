@@ -1,48 +1,26 @@
-import asyncio
-from pyrogram import Client
-from pyrogram.handlers import MessageHandler
+from asyncio import sleep
 from pyrogram.types import Message
+from pyrogram.handlers import MessageHandler
+
+from user_bot.misc.util import cmd, get_me_filters
 from user_bot.misc.constants import VIP_STATUS
-from user_bot.misc.util import get_me_filters, cmd
 
 
-@cmd()
-async def stupid(app: Client, msg: Message):
-    speed = 0.1
-    first_str = 'YOUR BRAIN ➡️ 🧠\n\n🧠'
-    await msg.edit(f'{first_str}         (^_^)🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}       (^_^)  🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}     (^_^)    🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}   (^_^)      🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str} (^_^)        🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}<(^_^ <)      🗑')
-    await asyncio.sleep(speed)
-
-    first_str = 'YOUR BRAIN ➡️ 🧠\n\n'
-    await msg.edit(f'{first_str}(> ^_^)>🧠    🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str} (> ^_^)>🧠   🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}  (> ^_^)>🧠  🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}   (> ^_^)>🧠 🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}    (> ^_^)>🧠🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}     (> ^_^)> 🗑')
-    await asyncio.sleep(speed)
-    await msg.edit(f'{first_str}     (> 3_3)> 🗑')
-    await asyncio.sleep(1)
+@cmd(False)
+async def __bagger_fast(app, msg: Message):
+    text = ''
+    total = 'Pythоn ИМБА, Pythоn ЕДИН. И BaggerFast непобедим!!!'
+    for char in total:
+        text += char
+        if char == ' ':
+            continue
+        await msg.edit(f"<b>{text}</b>")
+        await sleep(0.1)
 
 
 def get_vip_handlers() -> list[MessageHandler]:
     if not VIP_STATUS:
         return []
     return [
-        MessageHandler(stupid, filters=get_me_filters("stupid"))
+        MessageHandler(__bagger_fast, filters=get_me_filters('bf')),
     ]

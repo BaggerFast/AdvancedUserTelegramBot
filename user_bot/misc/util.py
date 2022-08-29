@@ -8,7 +8,7 @@ from user_bot.misc.constants import VIP_STATUS
 
 
 def get_me_filters(command: str) -> bool:
-    return filters.me and filters.command(command, ".")
+    return filters.me & filters.command(command, ".")
 
 
 def cmd(auto_del=True):
@@ -20,10 +20,9 @@ def cmd(auto_del=True):
                 await asyncio.sleep(3)
                 await msg.edit('<b>By userbot</b> - <a href="https://t.me/Gosha_developer_bot">Ссылка</a>')
                 await msg.delete(revoke=False)
-            else:
-                if auto_del:
-                    await msg.delete()
-
+            elif auto_del:
+                await asyncio.sleep(3)
+                await msg.delete()
         return wrapper
     return input_func
 
