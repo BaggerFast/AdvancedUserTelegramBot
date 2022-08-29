@@ -156,7 +156,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
         await state.finish()
         return
     except SessionPasswordNeeded as e:
-        logger.error(e)
+        logger.debug("У пользователя включена 2-х этапная аунтефикаия")
         await bot.send_message(msg.from_user.id, "Введи 2fa")
         await state.set_state(CreateUserBotState.TWO_FA_PASSWORD)
         return

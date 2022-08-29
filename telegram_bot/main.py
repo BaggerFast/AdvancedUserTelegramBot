@@ -21,7 +21,6 @@ async def __on_start_up(dp: Dispatcher) -> None:
 
     users_tg_id = get_users_with_sessions()
     count = 0
-    logger.debug(users_tg_id)
     if not users_tg_id:
         logger.info("В базе никого нет, я хочу плакать. У меня дипрессия и мне одиноко!")
         return

@@ -7,10 +7,10 @@ aiogram~=2.22.1
 SQLAlchemy~=1.4.40
 
 # Debug
-pylint
+pylint_runner
 loguru~=0.6.0
 
 # Other
 asyncio
 tgcrypto
-# uvloop
+
