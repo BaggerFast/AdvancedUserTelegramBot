@@ -29,7 +29,7 @@ async def __on_success_buy(msg: Message) -> None:
     if user_id in _process:
         process_bot = _process[user_id]
         process_bot.kill()
-        del (_process[user_id])
+        del _process[user_id]
         await bot.send_message(user_id, "Вы успешно оформили вип доступ!\n"
                                         "Запустите User бота заново, что-бы получить все возможности",
                                reply_markup=main_keyboard_start_pro)

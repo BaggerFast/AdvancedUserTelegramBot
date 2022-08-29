@@ -64,7 +64,6 @@ async def __lol(app: Client, msg: Message):
         "┃╱╱╱┃┃╱╰╯╱┃┃╱╱╱┃",
         "┗━━━┛╰━━━━╯┗━━━┛",
     )
-    # todo: like this in stikers and texts
     await play_stroke_anim(msg, text)
 
 

@@ -1,5 +1,5 @@
 from loguru import logger
-from sqlalchemy import select, update, exc, delete
+from sqlalchemy import select, update, exc
 
 from .main_database import Database
 from .models import User, Session

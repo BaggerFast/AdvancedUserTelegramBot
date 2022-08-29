@@ -3,10 +3,11 @@ from random import choice, randint
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
+from pyrogram.types import Message
+
+from user_bot.misc.util import get_me_filters, cmd, play_anim
 from user_bot.handlers.common.stickers import _get_sticker_handlers
 from user_bot.handlers.common.texts import _get_text_handlers
-from user_bot.misc.util import get_me_filters, cmd, play_anim
-from pyrogram.types import Message
 
 
 @cmd(False)
