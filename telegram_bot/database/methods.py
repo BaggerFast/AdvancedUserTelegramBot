@@ -6,6 +6,7 @@ from .models import User, Session
 
 
 def create_user(telegram_id: int) -> None:
+    # todo: refactor
     select_query = select(User.telegram_id).where(User.telegram_id == telegram_id)
     session = Database().session
     if session.execute(select_query).fetchone():
@@ -15,7 +16,7 @@ def create_user(telegram_id: int) -> None:
     session.commit()
 
 
-def create_user_bot_session(user: User, user_bot_session: str):
+def create_user_bot_session(user: User, user_bot_session: str) -> None:
     session = Database().session
     session.add(Session(user_id=user.id, session=user_bot_session))
     session.commit()
@@ -32,8 +33,7 @@ def get_user_by_id_telegram_id(telegram_id: int) -> User | None:
 
 def check_vip(telegram_id) -> bool:
     select_query = select(User.vip).where(User.telegram_id == telegram_id)
-    result = bool(Database().session.execute(select_query).fetchone()[0])
-    return result
+    return bool(Database().session.execute(select_query).fetchone()[0])
 
 
 def set_vip(telegram_id) -> None:
@@ -43,11 +43,8 @@ def set_vip(telegram_id) -> None:
     session.commit()
 
 
-def get_users_with_sessions():
-    select_query = select(User.telegram_id).where(User.session)
-    result = Database().session.execute(select_query).fetchall()
-    if not result:
-        return None
-    else:
-        return result
+def get_users_with_sessions() -> list[tuple[User]] | None:
+    select_query = select(User).where(User.session)
+    return Database().session.execute(select_query).fetchall()
+
 # endregion

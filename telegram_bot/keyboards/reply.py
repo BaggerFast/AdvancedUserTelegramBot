@@ -1,17 +1,24 @@
 from typing import Final
-
 from aiogram import types
 
-main_keyboard_start_trial: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-main_keyboard_start_trial.add(types.KeyboardButton(text="Подключить бота"),
-                              types.KeyboardButton(text="Купить полную версию"))
+# region Start kb
 
-main_keyboard_start_pro: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-main_keyboard_start_pro.add(types.KeyboardButton(text="Подключить бота"))
+KB_START_TRIAL: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+KB_START_TRIAL.add(types.KeyboardButton(text="Подключить бота"),
+                   types.KeyboardButton(text="Купить полную версию"))
 
-main_keyboard_pro_bot_started: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-main_keyboard_pro_bot_started.add(types.KeyboardButton(text="Остановить бота"))
+KB_START_PRO: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+KB_START_PRO.add(types.KeyboardButton(text="Подключить бота"))
 
-main_keyboard_trial_bot_started: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-main_keyboard_trial_bot_started.add(types.KeyboardButton(text="Остановить бота"),
-                                    types.KeyboardButton(text="Купить полную версию"))
+# endregion
+
+# region Stop kb
+
+KB_STOP_PRO_BOT: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+KB_STOP_PRO_BOT.add(types.KeyboardButton(text="Остановить бота"))
+
+KB_STOP_TRIAL_BOT: Final = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+KB_STOP_TRIAL_BOT.add(types.KeyboardButton(text="Остановить бота"),
+                      types.KeyboardButton(text="Купить полную версию"))
+
+# endregion

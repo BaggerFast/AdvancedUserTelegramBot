@@ -1,3 +1,3 @@
-from .reply import main_keyboard_start_trial, main_keyboard_start_pro, main_keyboard_pro_bot_started, \
-    main_keyboard_trial_bot_started
+from .reply import KB_START_TRIAL, KB_START_PRO, KB_STOP_PRO_BOT, \
+    KB_STOP_TRIAL_BOT
 from .inline import me_telegram_keyboard

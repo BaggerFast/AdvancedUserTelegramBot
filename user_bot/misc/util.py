@@ -1,4 +1,3 @@
-import asyncio
 import functools
 
 from asyncio import sleep

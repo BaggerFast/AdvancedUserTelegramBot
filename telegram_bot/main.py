@@ -9,8 +9,7 @@ from telegram_bot.database.methods import get_users_with_sessions
 from telegram_bot.env import TgBot
 from telegram_bot.database import register_models
 from telegram_bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers
-from telegram_bot.database.methods import check_vip
-from telegram_bot.keyboards.reply import main_keyboard_start_pro, main_keyboard_start_trial
+from telegram_bot.keyboards.reply import KB_START_PRO, KB_START_TRIAL
 
 
 async def __on_start_up(dp: Dispatcher) -> None:
@@ -19,27 +18,35 @@ async def __on_start_up(dp: Dispatcher) -> None:
     register_models()
     __register_all_handlers(dp)
 
-    users_tg_id = get_users_with_sessions()
+    users = get_users_with_sessions()
     count = 0
-    if not users_tg_id:
+
+    if not users:
         logger.info("В базе никого нет, я хочу плакать. У меня дипрессия и мне одиноко!")
         return
-    for tg_id in users_tg_id:
+
+    for key in users:
+        user = key[0]
         with suppress(ChatNotFound):
-            if check_vip(tg_id[0]):
-                await dp.bot.send_message(tg_id[0], "Бот обновлен и перезапущен, перезапустите сессию",
-                                          reply_markup=main_keyboard_start_pro)
-            else:
-                await dp.bot.send_message(tg_id[0], "Бот обновлен и перезапущен, перезапустите сессию",
-                                          reply_markup=main_keyboard_start_trial)
+            keyboard = KB_START_PRO if user.vip else KB_START_TRIAL
+            await dp.bot.send_message(
+                user.telegram_id,
+                "Бот обновлен и перезапущен, перезапустите сессию",
+                reply_markup=keyboard
+            )
             count += 1
+
     logger.info(f"Было совершено {count} рассылок")
 
 
 def __register_all_handlers(dp: Dispatcher) -> None:
-    register_admin_handlers(dp)
-    register_users_handlers(dp)
-    register_other_handlers(dp)
+    handlers = (
+        register_admin_handlers,
+        register_users_handlers,
+        register_other_handlers
+    )
+    for handler in handlers:
+        handler(dp)
 
 
 def start_telegram_bot() -> None:

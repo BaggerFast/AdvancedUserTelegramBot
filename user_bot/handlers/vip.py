@@ -2,8 +2,7 @@ from asyncio import sleep
 from pyrogram.types import Message
 from pyrogram.handlers import MessageHandler
 
-from user_bot.misc.util import cmd, get_me_filters
-from user_bot.misc.constants import VIP_STATUS
+from user_bot.misc import cmd, get_me_filters, VIP_STATUS
 
 
 @cmd(False)

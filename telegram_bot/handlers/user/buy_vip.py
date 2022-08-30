@@ -3,7 +3,7 @@ from aiogram.types import PreCheckoutQuery, ContentTypes, Message, LabeledPrice
 
 from telegram_bot.env import TgBot
 from telegram_bot.database.methods import set_vip
-from telegram_bot.keyboards import main_keyboard_start_pro
+from telegram_bot.keyboards import KB_START_PRO
 from telegram_bot.handlers.user.user_bot_creator import _process
 
 
@@ -32,10 +32,10 @@ async def __on_success_buy(msg: Message) -> None:
         del _process[user_id]
         await bot.send_message(user_id, "Вы успешно оформили вип доступ!\n"
                                         "Запустите User бота заново, что-бы получить все возможности",
-                               reply_markup=main_keyboard_start_pro)
+                               reply_markup=KB_START_PRO)
     else:
         await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!\n",
-                               reply_markup=main_keyboard_start_pro)
+                               reply_markup=KB_START_PRO)
 
 
 async def __check_oup_process(check_out_query: PreCheckoutQuery) -> None:

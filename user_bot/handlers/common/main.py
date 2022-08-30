@@ -5,7 +5,7 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
-from user_bot.misc.util import get_me_filters, cmd, play_anim
+from user_bot.misc import get_me_filters, cmd, play_anim
 from user_bot.handlers.common.stickers import _get_sticker_handlers
 from user_bot.handlers.common.texts import _get_text_handlers
 
@@ -25,7 +25,7 @@ async def __kill(app, msg: Message):
     await sleep(1)
 
     for i in range(6):
-        await msg.edit(f"<b>👀 Поиск{'.'*(i%3+1)}</b>")
+        await msg.edit(f"<b>👀 Поиск{'.' * (i % 3 + 1)}</b>")
         await sleep(0.5)
 
     kill = ["Убийца нашел тебя, к сожалению ты спрятался плохо и был убит",
@@ -121,7 +121,7 @@ async def __coin(app: Client, msg: Message):
         '100% █████████████',
     )
     for i in range(1, 4):
-        await msg.edit(f'<b>🪙 Бросаю монетку{"."*i}</b>')
+        await msg.edit(f'<b>🪙 Бросаю монетку{"." * i}</b>')
         await sleep(0.5)
     for text in loader:
         await msg.edit(f'{text}')
@@ -130,15 +130,15 @@ async def __coin(app: Client, msg: Message):
     await msg.edit(f'''<b>Мой вердикт: {choice(('Орел', 'Решка'))}</b>''')
 
 
-def get_common_handlers() -> list[MessageHandler]:
-    handlers = [
+def get_common_handlers() -> tuple[MessageHandler, ...]:
+    return (
         MessageHandler(__bombs, filters=get_me_filters('bombs')),
         MessageHandler(__kill, filters=get_me_filters('kill')),
         MessageHandler(__night, filters=get_me_filters('night')),
         MessageHandler(__stupid, filters=get_me_filters('stupid')),
         MessageHandler(__compli, filters=get_me_filters('compli')),
-        MessageHandler(__coin, filters=get_me_filters('coin'))
-    ]
-    handlers.extend(_get_sticker_handlers())
-    handlers.extend(_get_text_handlers())
-    return handlers
+        MessageHandler(__coin, filters=get_me_filters('coin')),
+
+        *_get_sticker_handlers(),
+        *_get_text_handlers(),
+    )

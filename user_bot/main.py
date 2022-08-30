@@ -5,9 +5,10 @@ from user_bot.handlers import get_common_handlers, get_vip_handlers
 
 
 def __register_all_handlers(client: Client) -> None:
-    handlers = []
-    handlers.extend(get_common_handlers())
-    handlers.extend(get_vip_handlers())
+    handlers = (
+        *get_common_handlers(),
+        *get_vip_handlers(),
+    )
     for handler in handlers:
         client.add_handler(handler)
 
