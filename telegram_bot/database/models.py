@@ -11,6 +11,7 @@ class User(Database.BASE):
     id = Column(Integer, primary_key=True)
     telegram_id = Column(Integer, nullable=False)
     vip = Column(Integer, default=0)
+    admin = Column(Integer, default=0)
     session = relationship('Session', uselist=False, backref="USER")
 
 

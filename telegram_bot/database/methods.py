@@ -6,7 +6,6 @@ from .models import User, Session
 
 
 def create_user(telegram_id: int) -> None:
-    # todo: refactor
     select_query = select(User.telegram_id).where(User.telegram_id == telegram_id)
     session = Database().session
     if session.execute(select_query).fetchone():
@@ -47,4 +46,24 @@ def get_users_with_sessions() -> list[tuple[User]] | None:
     select_query = select(User).where(User.session)
     return Database().session.execute(select_query).fetchall()
 
+
+def check_admin(telegram_id) -> bool:
+    create_user(telegram_id)
+    select_query = select(User.admin).where(User.telegram_id == telegram_id)
+    session = Database().session
+    result = session.execute(select_query).fetchone()
+    return bool(result[0])
+
+
+def set_admin(telegram_id) -> None:
+    session = Database().session
+    update_query = update(User, values={User.admin: 1}).where(User.telegram_id == telegram_id)
+    session.execute(update_query)
+    session.commit()
+
+
+def get_all_users():
+    session = Database().session
+    select_query = select(User.telegram_id)
+    return session.execute(select_query).fetchall()
 # endregion

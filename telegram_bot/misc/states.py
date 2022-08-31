@@ -9,3 +9,13 @@ class CreateUserBotState(StatesGroup):
     PHONE: Final = State()
     AUTH_CODE: Final = State()
     TWO_FA_PASSWORD: Final = State()
+
+
+class AdminStates(StatesGroup):
+    ADMIN: Final = State()
+
+    class AddAdmin(StatesGroup):
+        INSERT_NEW_ADMIN: Final = State()
+
+    class Advertising(StatesGroup):
+        INSERT_ADVERT_TEXT: Final = State()
