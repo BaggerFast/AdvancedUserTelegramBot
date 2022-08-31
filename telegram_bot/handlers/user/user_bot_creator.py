@@ -13,6 +13,7 @@ from telegram_bot.database.methods import create_user_bot_session, get_user_by_i
 from telegram_bot.keyboards import me_telegram_keyboard
 from telegram_bot.misc import CreateUserBotState, start_user_bot
 from telegram_bot.misc.util import get_main_keyboard
+from misc.telegram_api_config import API_ID, API_HASH
 
 __sessions: dict[int, Client] = {}
 _process: dict[int, Popen] = {}
@@ -40,7 +41,6 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
         keyboard = get_main_keyboard(user_id, True)
         await bot.send_message(user_id, "Ваш бот уже запущен!", reply_markup=keyboard)
         return
-
     if user and user.session:
         process = start_user_bot(user.session.session, user_id, user.vip)
         _process[user_id] = process
@@ -53,33 +53,9 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
             reply_markup=keyboard
         )
         return
-
     await bot.send_message(user_id, "Если вы решите отменить авторизацию напишите - /cancel")
-    await bot.send_message(user_id, 'Узнать данные можно тут👇', reply_markup=me_telegram_keyboard)
-    await bot.send_message(user_id, "Введите ваш api-id:", reply_markup=types.ReplyKeyboardRemove())
-    await state.set_state(CreateUserBotState.API_ID)
-
-
-async def __input_api_id(msg: Message, state: FSMContext) -> None:
-    bot: Bot = msg.bot
-    if msg.text.isdigit():
-        async with state.proxy() as data:
-            data['write_api_id'] = int(msg.text)
-    else:
-        await bot.send_message(msg.from_user.id, "api-id должен состоять только из цифр! Вы где-то ошиблись!")
-        return
-    await bot.send_message(msg.from_user.id, "Введите api-hash:")
-    await state.set_state(CreateUserBotState.API_HASH)
-
-
-async def __input_api_hash(msg: Message, state: FSMContext) -> None:
-    bot: Bot = msg.bot
-    if len(msg.text) != 32:
-        await bot.send_message(msg.from_user.id, "api-hash должен состоять из 32 символов! Вы где-то ошиблись!")
-        return
-    async with state.proxy() as data:
-        data['write_api_hash'] = msg.text
-    await bot.send_message(msg.from_user.id, "Введите ваш номер телефона:")
+    await bot.send_message(user_id, "Введите ваш номер телефона:\n"
+                                    "(В таком формате - +0 000 000 00 00)", reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(CreateUserBotState.PHONE)
 
 
@@ -90,8 +66,8 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
     try:
         client = Client(
             name=str(msg.from_user.id),
-            api_id=user_data["write_api_id"],
-            api_hash=user_data["write_api_hash"],
+            api_id=API_ID,
+            api_hash=API_HASH,
             in_memory=True,
         )
         await client.connect()
@@ -150,8 +126,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
         await state.finish()
         return
     except SessionPasswordNeeded as e:
-        logger.debug("У пользователя включена 2-х этапная аунтефикаия")
-        await bot.send_message(msg.from_user.id, "Введи 2fa")
+        await bot.send_message(msg.from_user.id, "Введи пароль двух-этапной аунтефикации:")
         await state.set_state(CreateUserBotState.TWO_FA_PASSWORD)
         return
 
@@ -178,8 +153,8 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     try:
         await client.check_password(password=msg.text)
     except PasswordHashInvalid as e:
-        logger.error(e)
-        await bot.send_message(user_id, "Повтори")
+        await bot.send_message(user_id, "Вы ввели не верный пароль двух-этапной аунтефикации!\n"
+                                        "Введи пароль ещё раз:")
         return
 
     string_session = await client.export_session_string()
@@ -208,8 +183,6 @@ def _register_user_bot_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__stop_register_user_bot, commands=['cancel'], state="*")
 
     dp.register_message_handler(__start_input_user_settings, content_types=['text'], text="Подключить бота")
-    dp.register_message_handler(__input_api_id, content_types=['text'], state=CreateUserBotState.API_ID)
-    dp.register_message_handler(__input_api_hash, content_types=['text'], state=CreateUserBotState.API_HASH)
     dp.register_message_handler(__input_phone, content_types=['text'], state=CreateUserBotState.PHONE)
     dp.register_message_handler(__input_oauth_code, content_types=['text'], state=CreateUserBotState.AUTH_CODE)
     dp.register_message_handler(__input_2fa_password, content_types=['text'], state=CreateUserBotState.TWO_FA_PASSWORD)
