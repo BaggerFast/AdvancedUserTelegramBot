@@ -3,11 +3,10 @@ import functools
 from asyncio import sleep
 from contextlib import suppress
 
-import loguru
 from pyrogram import filters
 from pyrogram import Client
 from pyrogram.types import Message
-from user_bot.misc.constants import VIP_STATUS
+from user_bot.misc.constants import VIP_STATUS, ADVERT_LINK
 from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid
 
 
@@ -15,7 +14,7 @@ def get_me_filters(command: str) -> bool:
     return filters.me & filters.command(command, ".")
 
 
-def cmd(auto_del=True):
+def cmd(auto_del: bool = True):
     def input_func(handler):
         @functools.wraps(handler)
         async def wrapper(app: Client, msg: Message):
@@ -23,7 +22,7 @@ def cmd(auto_del=True):
                 await handler(app, msg)
                 if not VIP_STATUS:
                     await sleep(3)
-                    await msg.edit('<b>By userbot</b> - <a href="https://t.me/Gosha_developer_bot">Ссылка</a>')
+                    await msg.edit(f'<b>By userbot</b> - <a href="{ADVERT_LINK}">Ссылка</a>')
                     await msg.delete(revoke=False)
                 elif auto_del:
                     await sleep(3)

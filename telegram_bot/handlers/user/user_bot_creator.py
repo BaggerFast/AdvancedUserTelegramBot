@@ -10,10 +10,9 @@ from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, 
     ApiIdInvalid, PasswordHashInvalid
 
 from telegram_bot.database.methods import create_user_bot_session, get_user_by_id_telegram_id
-from telegram_bot.keyboards import me_telegram_keyboard
+from telegram_bot.env import TgBot
 from telegram_bot.misc import CreateUserBotState, start_user_bot
 from telegram_bot.misc.util import get_main_keyboard
-from misc.telegram_api_config import API_ID, API_HASH
 
 __sessions: dict[int, Client] = {}
 _process: dict[int, Popen] = {}
@@ -61,41 +60,40 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
 
 async def __input_phone(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
-    user_data = await state.get_data()
-
+    user_id = msg.from_user.id
     try:
         client = Client(
             name=str(msg.from_user.id),
-            api_id=API_ID,
-            api_hash=API_HASH,
+            api_id=TgBot.API_ID,
+            api_hash=TgBot.API_HASH,
             in_memory=True,
         )
         await client.connect()
     except (ApiIdInvalid, PasswordHashInvalid) as e:
         logger.error(e)
-        await bot.send_message(msg.from_user.id, "Введены не правильные ключи доступа. Начните все заново")
+        await bot.send_message(user_id, "Введены не правильные ключи доступа. Начните все заново")
         await state.finish()
         return
     try:
         code = await client.send_code(msg.text)
     except PhoneNumberInvalid as e:
         logger.error(e)
-        await bot.send_message(msg.from_user.id, "Введен не правильный номер телефона.\nПовторите попытку!")
+        await bot.send_message(user_id, "Введен не правильный номер телефона.\nПовторите попытку!")
         return
     except FloodWait as e:
         logger.error(e)
-        await bot.send_message(msg.from_user.id, f"Не удалось отправить смс!\n"
-                                                 f"Повторите попытку через - {timedelta(seconds=e.value)}")
+        await bot.send_message(user_id, f"Не удалось отправить смс!\n"
+                                        f"Повторите попытку через - {timedelta(seconds=e.value)}")
         await state.finish()
         return
 
     async with state.proxy() as data:
         data['write_phone'] = msg.text
         data['code'] = code
-        __sessions[msg.from_user.id] = client
+        __sessions[user_id] = client
 
-    await bot.send_message(msg.from_user.id, "Введите код подтверждения из телеграмма в таком формате 0-0-0-0-0: \n"
-                                             "Важно ставить тире после каждой цифры!")
+    await bot.send_message(user_id, "Введите код подтверждения из телеграмма в таком формате 0-0-0-0-0: \n"
+                                    "Важно ставить тире после каждой цифры!")
     await state.set_state(CreateUserBotState.AUTH_CODE)
 
 

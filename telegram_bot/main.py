@@ -35,7 +35,6 @@ async def __on_start_up(dp: Dispatcher) -> None:
                 reply_markup=keyboard
             )
             count += 1
-
     logger.info(f"Было совершено {count} рассылок")
 
 
