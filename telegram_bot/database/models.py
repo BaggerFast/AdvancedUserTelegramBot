@@ -12,13 +12,13 @@ class User(Database.BASE):
     telegram_id = Column(Integer, nullable=False)
     vip = Column(Integer, default=0)
     admin = Column(Integer, default=0)
-    session = relationship('Session', uselist=False, backref="USER")
+    session = relationship('Session', uselist=False, backref="USER", passive_deletes=True)
 
 
 class Session(Database.BASE):
     __tablename__ = 'SESSION'
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('USER.id'), unique=True)
+    user_id = Column(Integer, ForeignKey('USER.id', ondelete='CASCADE'), unique=True)
     session = Column(String, nullable=False)
 
 

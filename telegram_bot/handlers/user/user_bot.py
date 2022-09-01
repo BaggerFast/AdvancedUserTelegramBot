@@ -9,6 +9,7 @@ from pyrogram import Client
 from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneNumberInvalid, PhoneCodeExpired, \
     ApiIdInvalid, PasswordHashInvalid
 
+from telegram_bot.database.main_database import Database
 from telegram_bot.database.methods import create_user_bot_session, get_user_by_id_telegram_id
 from telegram_bot.env import TgBot
 from telegram_bot.misc import CreateUserBotState, start_user_bot
@@ -18,17 +19,7 @@ __sessions: dict[int, Client] = {}
 _process: dict[int, Popen] = {}
 
 
-async def __stop_bot(msg: Message) -> None:
-    bot: Bot = msg.bot
-    user_id = msg.from_user.id
-
-    if user_id in _process:
-        _process[user_id].kill()
-        del _process[user_id]
-
-        keyboard = get_main_keyboard(user_id, user_id in _process)
-        await bot.send_message(user_id, "User bot остановлен!", reply_markup=keyboard)
-
+# region with State
 
 async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
@@ -154,7 +145,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
         await bot.send_message(user_id, "Вы ввели не верный пароль двух-этапной аунтефикации!\n"
                                         "Введи пароль ещё раз:")
         return
-
+    await msg.delete()
     string_session = await client.export_session_string()
 
     if user := get_user_by_id_telegram_id(msg.from_user.id):
@@ -166,7 +157,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     del (__sessions[user_id])
 
     keyboard = get_main_keyboard(user_id, user_id in _process)
-    await bot.send_message(msg.from_user.id, "User bot запущен", reply_markup=keyboard)
+    await bot.send_message(user_id, "User bot запущен", reply_markup=keyboard)
 
     await state.finish()
 
@@ -177,12 +168,49 @@ async def __stop_register_user_bot(msg: Message, state: FSMContext) -> None:
     await bot.send_message(msg.from_user.id, "Авторизация юзер бота отменена!")
 
 
+# endregion
+
+
+async def __stop_bot(msg: Message) -> None:
+    bot: Bot = msg.bot
+    user_id = msg.from_user.id
+
+    if user_id in _process:
+        _process[user_id].kill()
+        del _process[user_id]
+
+        keyboard = get_main_keyboard(user_id, user_id in _process)
+        await bot.send_message(user_id, "User bot остановлен!", reply_markup=keyboard)
+
+
+async def __delete_session(msg: Message) -> None:
+    bot: Bot = msg.bot
+    user_id = msg.from_user.id
+    user = get_user_by_id_telegram_id(user_id)
+    # todo: replace db logic
+    if user and user.session:
+        Database().session.delete(user.session)
+        Database().session.commit()
+        _process[user_id].kill()
+        del _process[user_id]
+    keyboard = get_main_keyboard(user_id, user_id in _process)
+    await bot.send_message(user_id, "Ваши данные удалены и User bot остановлен!", reply_markup=keyboard)
+
+    # if user_id in _process:
+    #     _process[user_id].kill()
+    #     del _process[user_id]
+    #
+    #     keyboard = get_main_keyboard(user_id, user_id in _process)
+    #     await bot.send_message(user_id, "User bot остановлен!", reply_markup=keyboard)
+
+
 def _register_user_bot_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__stop_register_user_bot, commands=['cancel'], state="*")
 
-    dp.register_message_handler(__start_input_user_settings, content_types=['text'], text="Подключить бота")
     dp.register_message_handler(__input_phone, content_types=['text'], state=CreateUserBotState.PHONE)
     dp.register_message_handler(__input_oauth_code, content_types=['text'], state=CreateUserBotState.AUTH_CODE)
     dp.register_message_handler(__input_2fa_password, content_types=['text'], state=CreateUserBotState.TWO_FA_PASSWORD)
 
+    dp.register_message_handler(__start_input_user_settings, content_types=['text'], text="Подключить бота")
     dp.register_message_handler(__stop_bot, content_types=['text'], text="Остановить бота")
+    dp.register_message_handler(__delete_session, content_types=['text'], text="Удалить свои данные")

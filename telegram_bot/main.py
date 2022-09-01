@@ -9,7 +9,7 @@ from telegram_bot.database.methods import get_users_with_sessions
 from telegram_bot.env import TgBot
 from telegram_bot.database import register_models
 from telegram_bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers
-from telegram_bot.keyboards.reply import KB_START_PRO, KB_START_TRIAL
+from telegram_bot.misc.util import get_main_keyboard
 
 
 async def __on_start_up(dp: Dispatcher) -> None:
@@ -28,11 +28,10 @@ async def __on_start_up(dp: Dispatcher) -> None:
     for key in users:
         user = key[0]
         with suppress(ChatNotFound):
-            keyboard = KB_START_PRO if user.vip else KB_START_TRIAL
             await dp.bot.send_message(
                 user.telegram_id,
                 "Бот обновлен и перезапущен, перезапустите сессию",
-                reply_markup=keyboard
+                reply_markup=get_main_keyboard(user.telegram_id, False)
             )
             count += 1
     logger.info(f"Было совершено {count} рассылок")

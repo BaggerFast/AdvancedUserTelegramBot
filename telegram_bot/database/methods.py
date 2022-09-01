@@ -66,4 +66,5 @@ def get_all_users():
     session = Database().session
     select_query = select(User.telegram_id)
     return session.execute(select_query).fetchall()
+
 # endregion
