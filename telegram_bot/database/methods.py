@@ -67,4 +67,10 @@ def get_all_users():
     select_query = select(User.telegram_id)
     return session.execute(select_query).fetchall()
 
+
+def delete_session(telegram_id):
+    user = get_user_by_id_telegram_id(telegram_id)
+    if user and user.session:
+        Database().session.delete(user.session)
+        Database().session.commit()
 # endregion
