@@ -145,7 +145,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
         await bot.send_message(user_id, "Вы ввели не верный пароль двух-этапной аунтефикации!\n"
                                         "Введи пароль ещё раз:")
         return
-    await msg.delete()
+
     string_session = await client.export_session_string()
 
     if user := get_user_by_id_telegram_id(msg.from_user.id):
@@ -157,6 +157,8 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     del (__sessions[user_id])
 
     keyboard = get_main_keyboard(user_id, user_id in _process)
+
+    await msg.delete()
     await bot.send_message(user_id, "User bot запущен", reply_markup=keyboard)
 
     await state.finish()
@@ -191,17 +193,11 @@ async def __delete_session(msg: Message) -> None:
     if user and user.session:
         Database().session.delete(user.session)
         Database().session.commit()
-        _process[user_id].kill()
-        del _process[user_id]
+        if user_id in _process:
+            _process[user_id].kill()
+            del _process[user_id]
     keyboard = get_main_keyboard(user_id, user_id in _process)
     await bot.send_message(user_id, "Ваши данные удалены и User bot остановлен!", reply_markup=keyboard)
-
-    # if user_id in _process:
-    #     _process[user_id].kill()
-    #     del _process[user_id]
-    #
-    #     keyboard = get_main_keyboard(user_id, user_id in _process)
-    #     await bot.send_message(user_id, "User bot остановлен!", reply_markup=keyboard)
 
 
 def _register_user_bot_handlers(dp: Dispatcher) -> None:

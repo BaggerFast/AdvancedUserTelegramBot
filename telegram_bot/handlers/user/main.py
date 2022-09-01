@@ -1,7 +1,7 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message
 
-from telegram_bot.database.methods import create_user, check_vip
+from telegram_bot.database.methods import create_user
 from telegram_bot.handlers.user.user_bot import _register_user_bot_handlers
 from telegram_bot.handlers.user.buy_vip import _register_vip_handlers
 from .user_bot import _process
