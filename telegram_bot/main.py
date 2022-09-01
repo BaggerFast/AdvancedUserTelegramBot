@@ -2,7 +2,7 @@ from contextlib import suppress
 
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.utils.exceptions import ChatNotFound
+from aiogram.utils.exceptions import ChatNotFound, BotBlocked
 from loguru import logger
 
 from telegram_bot.database.methods import get_users_with_sessions
@@ -27,7 +27,7 @@ async def __on_start_up(dp: Dispatcher) -> None:
 
     for key in users:
         user = key[0]
-        with suppress(ChatNotFound):
+        with suppress(ChatNotFound, BotBlocked):
             await dp.bot.send_message(
                 user.telegram_id,
                 "Бот обновлен и перезапущен, перезапустите сессию",
