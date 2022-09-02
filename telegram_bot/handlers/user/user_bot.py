@@ -11,7 +11,7 @@ from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, 
 
 from telegram_bot.database.methods import create_user_bot_session, get_user_by_id_telegram_id, delete_session
 from telegram_bot.env import TgBot
-from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP
+from telegram_bot.keyboards import KB_CONTACT
 from telegram_bot.misc import CreateUserBotState, start_user_bot
 from telegram_bot.misc.util import get_main_keyboard
 
@@ -198,7 +198,6 @@ async def __delete_session(msg: Message) -> None:
 
 
 def _register_user_bot_handlers(dp: Dispatcher) -> None:
-    dp.register_message_handler(__stop_register_user_bot, commands=['cancel'], state="*")
     dp.register_callback_query_handler(__stop_register_user_bot, lambda c: c.data == "cancel_setup", state="*")
 
     dp.register_message_handler(__input_phone, content_types=[types.ContentType.CONTACT],
