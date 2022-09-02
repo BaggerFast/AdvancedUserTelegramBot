@@ -13,9 +13,6 @@ class CreateUserBotState(StatesGroup):
 
 class AdminStates(StatesGroup):
     ADMIN: Final = State()
-
-    class AddAdmin(StatesGroup):
-        INSERT_NEW_ADMIN: Final = State()
-
-    class Advertising(StatesGroup):
-        INSERT_ADVERT_TEXT: Final = State()
+    INSERT_NEW_ADMIN: Final = State()
+    INSERT_ADVERT_TEXT: Final = State()
+    SET_VIP: Final = State()
