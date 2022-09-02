@@ -36,11 +36,11 @@ async def __on_success_buy(msg: Message) -> None:
         process_bot.kill()
         del _process[user_id]
 
-        await bot.send_message(user_id, "Вы успешно оформили вип доступ!\n"
+        await bot.send_message(user_id, "Вы успешно оформили вип доступ!🥳\n"
                                         "Запустите User бота заново, что-бы получить все возможности",
                                reply_markup=get_main_keyboard(user_id, user_id in _process))
     else:
-        await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!\n",
+        await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!🥳\n",
                                reply_markup=get_main_keyboard(user_id, user_id in _process))
 
 
@@ -50,6 +50,6 @@ async def __check_oup_process(check_out_query: PreCheckoutQuery) -> None:
 
 
 def _register_vip_handlers(dp: Dispatcher) -> None:
-    dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию")
+    dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию 💸")
     dp.register_message_handler(__on_success_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
     dp.register_pre_checkout_query_handler(__check_oup_process, lambda _: True)

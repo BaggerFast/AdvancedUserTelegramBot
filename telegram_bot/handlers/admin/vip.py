@@ -28,11 +28,11 @@ async def __vip_insert_tg_id(msg: Message, state: FSMContext):
     try:
         set_vip(other_user_id)
         await state.finish()
-        await bot.send_message(other_user_id, "Вам выдали vip доступ.",
+        await bot.send_message(other_user_id, "Администратор выдал вам vip доступ. ✨",
                                reply_markup=get_main_keyboard(other_user_id, False))
-        await bot.send_message(user_id, "Успешно")
+        await bot.send_message(user_id, "Успешно ✅")
     except Exception:
-        await bot.send_message(user_id, "Произошел сбой")
+        await bot.send_message(user_id, "Произошел сбой ⚠️")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
     await state.set_state(AdminStates.ADMIN)
 

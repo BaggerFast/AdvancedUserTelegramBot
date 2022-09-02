@@ -28,11 +28,11 @@ async def __admin_insert_tg_id(msg: Message, state: FSMContext):
         set_admin(admin_id)
         set_vip(admin_id)
         await state.finish()
-        await bot.send_message(admin_id, "Вас назначили администратором.\n",
+        await bot.send_message(admin_id, "Вас назначили администратором.🥳\n",
                                reply_markup=get_main_keyboard(admin_id, False))
-        await bot.send_message(user_id, "Успешно")
+        await bot.send_message(user_id, "Успешно ✅")
     except Exception:
-        await bot.send_message(user_id, "Админка не выдана. Произошел сбой")
+        await bot.send_message(user_id, "Админка не выдана. Произошел сбой ⚠️")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
     await state.set_state(AdminStates.ADMIN)
 
@@ -60,7 +60,7 @@ async def __do_advertising(query: Message, state: FSMContext):
             await bot.send_message(user[0], query.text)
             count += 1
     await state.set_state(AdminStates.ADMIN)
-    await bot.send_message(user_id, f"Рассылка выполнена - у {count} пользователей")
+    await bot.send_message(user_id, f"Рассылка выполнена - у {count} пользователей ✅")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
 
 

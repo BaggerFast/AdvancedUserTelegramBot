@@ -13,7 +13,9 @@ async def __start(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     keyboard = get_main_keyboard(user_id, user_id in _process)
-    await bot.send_message(user_id, "Hi, this is super user-bot!", reply_markup=keyboard)
+    await bot.send_message(user_id, f"Привет, <b>{msg.from_user.first_name}</b>!\n"
+                                    f"Это <b>лучший</b> юзер бот с анимациями!😎", reply_markup=keyboard,
+                           parse_mode="HTML")
 
 
 def register_users_handlers(dp: Dispatcher) -> None:

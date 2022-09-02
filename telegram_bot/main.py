@@ -30,7 +30,7 @@ async def __on_start_up(dp: Dispatcher) -> None:
         with suppress(ChatNotFound, BotBlocked):
             await dp.bot.send_message(
                 user.telegram_id,
-                "Бот обновлен и перезапущен, перезапустите сессию",
+                "Бот обновлен, запустите его заново! ⚠️",
                 reply_markup=get_main_keyboard(user.telegram_id, False)
             )
             count += 1

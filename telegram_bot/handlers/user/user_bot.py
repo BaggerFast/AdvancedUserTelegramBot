@@ -1,3 +1,4 @@
+from contextlib import suppress
 from datetime import timedelta
 from subprocess import Popen
 
@@ -39,14 +40,13 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
         await state.finish()
         await bot.send_message(
             user_id,
-            "Бот запущен.\n"
-            "Вам не надо проходить авторизацию, так как в базе уже есть ваши данные",
+            "Бот запущен! ✅\n",
             reply_markup=keyboard
         )
         return
-    await bot.send_message(user_id, "Если вы решите отменить авторизацию нажмите - Отмена",
-                           reply_markup=KB_CANCEL_SETUP)
-    await bot.send_message(user_id, "Предоставьте доступ к вашему контакту", reply_markup=KB_CONTACT)
+    await bot.send_message(user_id, "Отмена авторизации - Отменить",
+                           reply_markup=KB_CONTACT)
+    await bot.send_message(user_id, "❗️ Предоставьте доступ к вашему контакту ❗️", reply_markup=KB_CANCEL_SETUP)
     await state.set_state(CreateUserBotState.PHONE)
 
 
@@ -54,7 +54,7 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     phone_number = msg.contact.phone_number
-    try:
+    with suppress(Exception):
         client = Client(
             name=str(msg.from_user.id),
             api_id=TgBot.API_ID,
@@ -62,16 +62,11 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
             in_memory=True,
         )
         await client.connect()
-    except (ApiIdInvalid, PasswordHashInvalid) as e:
-        logger.error(e)
-        await bot.send_message(user_id, "Введены не правильные ключи доступа. Начните все заново")
-        await state.finish()
-        return
     try:
         code = await client.send_code(phone_number)
     except FloodWait as e:
         logger.error(e)
-        await bot.send_message(user_id, f"Не удалось отправить смс!\n"
+        await bot.send_message(user_id, f"Не удалось отправить смс! ⚠️\n"
                                         f"Повторите попытку через - {timedelta(seconds=e.value)}",
                                reply_markup=get_main_keyboard(user_id, False))
         await state.finish()
@@ -82,7 +77,8 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
         data['code'] = code
         __sessions[user_id] = client
 
-    await bot.send_message(user_id, "Важно ставить тире после каждой цифры!", reply_markup=types.ReplyKeyboardRemove())
+    await bot.send_message(user_id, "⚠️ Важно ставить тире после каждой цифры! ⚠️",
+                           reply_markup=types.ReplyKeyboardRemove())
     await bot.send_message(user_id, "Введите код подтверждения из телеграмма в таком формате 0-0-0-0-0: \n",
                            reply_markup=KB_CANCEL_SETUP)
     await state.set_state(CreateUserBotState.AUTH_CODE)
@@ -107,11 +103,11 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
         )
     except PhoneCodeInvalid as e:
         logger.error(e)
-        await bot.send_message(user_id, "Неверный код!\nПовторите авторизацию заново")
+        await bot.send_message(user_id, "Неверный код!\nПовторите авторизацию заново ⚠️")
         return
     except PhoneCodeExpired as e:
         logger.error(e)
-        await bot.send_message(user_id, "Код подтверждения иссек, попробуйте заново")
+        await bot.send_message(user_id, "Код подтверждения иссек, попробуйте заново ⚠️")
         await state.finish()
         return
     except SessionPasswordNeeded as e:
@@ -132,7 +128,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
     del __sessions[user_id]
 
     keyboard = get_main_keyboard(user_id, user_id in _process)
-    await bot.send_message(user_id, "User bot запущен", reply_markup=keyboard)
+    await bot.send_message(user_id, "User bot запущен ✅", reply_markup=keyboard)
     await state.finish()
 
 
@@ -143,7 +139,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     try:
         await client.check_password(password=msg.text)
     except PasswordHashInvalid as e:
-        await bot.send_message(user_id, "Вы ввели не верный пароль двух-этапной аунтефикации!\n"
+        await bot.send_message(user_id, "Вы ввели не верный пароль двух-этапной аунтефикации! ⚠️\n"
                                         "Введи пароль ещё раз:")
         return
 
@@ -160,8 +156,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     keyboard = get_main_keyboard(user_id, user_id in _process)
 
     await msg.delete()
-    await bot.send_message(user_id, "User bot запущен", reply_markup=keyboard)
-
+    await bot.send_message(user_id, "Бот запущен! ✅", reply_markup=keyboard)
     await state.finish()
 
 
@@ -169,7 +164,8 @@ async def __stop_register_user_bot(query: CallbackQuery, state: FSMContext) -> N
     bot: Bot = query.bot
     user_id = query.from_user.id
     await state.finish()
-    await bot.send_message(user_id, "Авторизация юзер бота отменена!", reply_markup=get_main_keyboard(user_id, False))
+    await bot.send_message(user_id, "Авторизация бота отменена! ❌", reply_markup=get_main_keyboard(user_id, False))
+
 
 # endregion
 
@@ -183,7 +179,7 @@ async def __stop_bot(msg: Message) -> None:
         del _process[user_id]
 
         keyboard = get_main_keyboard(user_id, user_id in _process)
-        await bot.send_message(user_id, "User bot остановлен!", reply_markup=keyboard)
+        await bot.send_message(user_id, "Бот остановлен! ⚠️", reply_markup=keyboard)
 
 
 async def __delete_session(msg: Message) -> None:
@@ -194,7 +190,7 @@ async def __delete_session(msg: Message) -> None:
         _process[user_id].kill()
         del _process[user_id]
     keyboard = get_main_keyboard(user_id, user_id in _process)
-    await bot.send_message(user_id, "Ваши данные удалены и User bot остановлен!", reply_markup=keyboard)
+    await bot.send_message(user_id, "Ваши данные удалены и User bot остановлен! ⚠️", reply_markup=keyboard)
 
 
 def _register_user_bot_handlers(dp: Dispatcher) -> None:
@@ -205,6 +201,6 @@ def _register_user_bot_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__input_oauth_code, content_types=['text'], state=CreateUserBotState.AUTH_CODE)
     dp.register_message_handler(__input_2fa_password, content_types=['text'], state=CreateUserBotState.TWO_FA_PASSWORD)
 
-    dp.register_message_handler(__start_input_user_settings, content_types=['text'], text="Подключить бота")
-    dp.register_message_handler(__stop_bot, content_types=['text'], text="Остановить бота")
-    dp.register_message_handler(__delete_session, content_types=['text'], text="Удалить свои данные")
+    dp.register_message_handler(__start_input_user_settings, content_types=['text'], text="Запустить бота ✅")
+    dp.register_message_handler(__stop_bot, content_types=['text'], text="Остановить бота ❌")
+    dp.register_message_handler(__delete_session, content_types=['text'], text="Удалить свои данные ⚠️")
