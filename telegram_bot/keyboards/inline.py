@@ -12,3 +12,9 @@ KB_ADMIN.add(
     InlineKeyboardButton("Рассылка", callback_data="advertising"),
     InlineKeyboardButton("Выйти", callback_data="admin_exit"),
 )
+
+
+KB_CANCEL_SETUP: Final = InlineKeyboardMarkup(1)
+KB_CANCEL_SETUP.add(
+    InlineKeyboardButton("Отменить", callback_data="cancel_setup")
+)

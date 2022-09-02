@@ -15,7 +15,9 @@ async def __admin_auth(msg: Message, state: FSMContext):
     user_id = msg.from_user.id
     if user_id == TgBot.ADMIN_ID:
         set_admin(user_id)
-        await bot.send_message(user_id, "Добро пожаловать хозяин!")
+        await bot.send_message(user_id, "Добро пожаловать хозяин!", reply_markup=get_main_keyboard(user_id, False))
+    elif check_admin(user_id):
+        await bot.send_message(user_id, "Админ панель", reply_markup=get_main_keyboard(user_id, False))
 
 
 async def __admin(msg: Message, state: FSMContext):
@@ -92,6 +94,7 @@ async def __do_advertising(msg: Message, state: FSMContext):
     await bot.send_message(user_id, f"Рассылка выполнена - у {count} пользователей")
     await bot.send_message(user_id, 'Админ панель', reply_markup=KB_ADMIN)
 
+
 # endregion
 
 
@@ -112,4 +115,3 @@ def register_admin_handlers(dp: Dispatcher) -> None:
                                 state=AdminStates.Advertising.INSERT_ADVERT_TEXT)
 
     dp.register_callback_query_handler(__exit_admin, lambda c: c.data == "admin_exit", state=AdminStates.ADMIN)
-

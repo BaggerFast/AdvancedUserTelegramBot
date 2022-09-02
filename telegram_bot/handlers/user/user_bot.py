@@ -11,7 +11,7 @@ from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, 
 
 from telegram_bot.database.methods import create_user_bot_session, get_user_by_id_telegram_id, delete_session
 from telegram_bot.env import TgBot
-from telegram_bot.keyboards import KB_CONTACT
+from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP
 from telegram_bot.misc import CreateUserBotState, start_user_bot
 from telegram_bot.misc.util import get_main_keyboard
 
