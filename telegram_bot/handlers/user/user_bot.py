@@ -3,12 +3,12 @@ from subprocess import Popen
 
 from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from loguru import logger
 from pyrogram import Client
 from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, \
     ApiIdInvalid, PasswordHashInvalid
-from telegram_bot.database.methods.create import create_user_bot_session
+from telegram_bot.database.methods.create import create_session
 from telegram_bot.database.methods.delete import delete_session
 from telegram_bot.database.methods.get import get_user_by_id_telegram_id
 from telegram_bot.env import TgBot
@@ -123,7 +123,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
     string_session = await client.export_session_string()
 
     if user := get_user_by_id_telegram_id(user_id):
-        create_user_bot_session(user, string_session)
+        create_session(user, string_session)
 
     await client.disconnect()
 
@@ -150,7 +150,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     string_session = await client.export_session_string()
 
     if user := get_user_by_id_telegram_id(msg.from_user.id):
-        create_user_bot_session(user, string_session)
+        create_session(user, string_session)
 
     await client.disconnect()
 
@@ -165,9 +165,9 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     await state.finish()
 
 
-async def __stop_register_user_bot(msg: Message, state: FSMContext) -> None:
-    bot: Bot = msg.bot
-    user_id = msg.from_user.id
+async def __stop_register_user_bot(query: CallbackQuery, state: FSMContext) -> None:
+    bot: Bot = query.bot
+    user_id = query.from_user.id
     await state.finish()
     await bot.send_message(user_id, "Авторизация юзер бота отменена!", reply_markup=get_main_keyboard(user_id, False))
 

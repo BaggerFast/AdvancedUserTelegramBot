@@ -3,7 +3,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 
-from telegram_bot.database.methods.get import get_all_users
+from telegram_bot.database.methods.get import get_all_telegram_id
 from telegram_bot.database.methods.update import set_admin, set_vip
 from telegram_bot.handlers.admin.auth import _get_auth_handlers
 from telegram_bot.handlers.admin.vip import _get_vip_handlers
@@ -13,9 +13,9 @@ from telegram_bot.misc.util import get_main_keyboard, get_admin_keyboard
 
 # region Add admin
 
-async def __add_admin(msg: CallbackQuery, state: FSMContext):
-    bot: Bot = msg.bot
-    await bot.send_message(msg.from_user.id, "Введите telegram_id нового админа:\n /cancel")
+async def __add_admin(query: CallbackQuery, state: FSMContext):
+    bot: Bot = query.bot
+    await bot.send_message(query.from_user.id, "Введите telegram_id нового админа:\n /cancel")
     await state.set_state(AdminStates.INSERT_NEW_ADMIN)
 
 
@@ -47,17 +47,17 @@ async def __advertising(msg: CallbackQuery, state: FSMContext):
     await state.set_state(AdminStates.INSERT_ADVERT_TEXT)
 
 
-async def __do_advertising(msg: Message, state: FSMContext):
-    bot: Bot = msg.bot
-    user_id = msg.from_user.id
-    users = get_all_users()
+async def __do_advertising(query: Message, state: FSMContext):
+    bot: Bot = query.bot
+    user_id = query.from_user.id
+    users = get_all_telegram_id()
     count = 0
     for user in users:
         # todo: remove Exception (ни разу не писал боту или добавил его в бан)
         with suppress(Exception):
             if user_id == user[0]:
                 continue
-            await bot.send_message(user[0], msg.text)
+            await bot.send_message(user[0], query.text)
             count += 1
     await state.set_state(AdminStates.ADMIN)
     await bot.send_message(user_id, f"Рассылка выполнена - у {count} пользователей")
