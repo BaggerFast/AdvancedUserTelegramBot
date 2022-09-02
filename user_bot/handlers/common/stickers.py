@@ -1,6 +1,10 @@
+from asyncio import sleep
+
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
+
+from user_bot.handlers.common.util import _get_heart_stickers
 from user_bot.misc import cmd, get_me_filters, play_stroke_anim
 
 
@@ -117,6 +121,15 @@ async def __dislike(app: Client, msg: Message):
     await play_stroke_anim(msg, img)
 
 
+@cmd(False)
+async def __heart(app: Client, msg: Message):
+    #todo: heart
+    img = _get_heart_stickers()
+    for anim in img:
+        await msg.edit('\n'.join(anim))
+        await sleep(0.2)
+
+
 def _get_sticker_handlers() -> tuple[MessageHandler, ...]:
     return (
         MessageHandler(__russia, filters=get_me_filters('russia')),
@@ -127,4 +140,5 @@ def _get_sticker_handlers() -> tuple[MessageHandler, ...]:
         MessageHandler(__gubka, filters=get_me_filters('gubka')),
         MessageHandler(__like, filters=get_me_filters('like')),
         MessageHandler(__dislike, filters=get_me_filters('dislike')),
+        MessageHandler(__heart, filters=get_me_filters('heart'))
     )

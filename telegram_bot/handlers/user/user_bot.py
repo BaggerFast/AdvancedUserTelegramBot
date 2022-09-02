@@ -189,7 +189,6 @@ async def __stop_bot(msg: Message) -> None:
 async def __delete_session(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
-    user = get_user_by_id_telegram_id(user_id)
     delete_session(user_id)
     if user_id in _process:
         _process[user_id].kill()

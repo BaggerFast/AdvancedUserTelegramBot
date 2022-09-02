@@ -5,6 +5,7 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
+from user_bot.handlers.common.games import _get_game_handlers
 from user_bot.misc import get_me_filters, cmd, play_anim
 from user_bot.handlers.common.stickers import _get_sticker_handlers
 from user_bot.handlers.common.texts import _get_text_handlers
@@ -109,27 +110,6 @@ async def __compli(app: Client, msg: Message):
     await msg.edit(f'<b>Cамая {choice(words)}</b> ✨')
 
 
-@cmd(False)
-async def __coin(app: Client, msg: Message):
-    loader = (
-        f'{randint(1, 10)}%   █▒▒▒▒▒▒▒▒▒▒▒▒',
-        f'{randint(15, 30)}%  ███▒▒▒▒▒▒▒▒▒▒',
-        f'{randint(30, 40)}%  █████▒▒▒▒▒▒▒▒',
-        f'{randint(45, 55)}%  ███████▒▒▒▒▒▒',
-        f'{randint(60, 75)}%  █████████▒▒▒▒',
-        f'{randint(80, 90)}%  ███████████▒▒',
-        '100% █████████████',
-    )
-    for i in range(1, 4):
-        await msg.edit(f'<b>🪙 Бросаю монетку{"." * i}</b>')
-        await sleep(0.5)
-    for text in loader:
-        await msg.edit(f'{text}')
-        await sleep(0.5)
-    await sleep(1)
-    await msg.edit(f'''<b>Мой вердикт: {choice(('Орел', 'Решка'))}</b>''')
-
-
 def get_common_handlers() -> tuple[MessageHandler, ...]:
     return (
         MessageHandler(__bombs, filters=get_me_filters('bombs')),
@@ -137,8 +117,10 @@ def get_common_handlers() -> tuple[MessageHandler, ...]:
         MessageHandler(__night, filters=get_me_filters('night')),
         MessageHandler(__stupid, filters=get_me_filters('stupid')),
         MessageHandler(__compli, filters=get_me_filters('compli')),
-        MessageHandler(__coin, filters=get_me_filters('coin')),
 
-        *_get_sticker_handlers(),
+        *_get_game_handlers(),
         *_get_text_handlers(),
+        *_get_sticker_handlers(),
+
+
     )
