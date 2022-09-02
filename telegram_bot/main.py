@@ -5,7 +5,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.exceptions import ChatNotFound, BotBlocked
 from loguru import logger
 
-from telegram_bot.database.methods import get_users_with_sessions
+from telegram_bot.database.methods.get import get_users_with_sessions
 from telegram_bot.env import TgBot
 from telegram_bot.database import register_models
 from telegram_bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers

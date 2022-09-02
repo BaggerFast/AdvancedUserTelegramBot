@@ -3,7 +3,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from .main_database import Database
+from .main import Database
 
 
 class User(Database.BASE):

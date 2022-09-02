@@ -1,9 +1,9 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import PreCheckoutQuery, ContentTypes, Message, LabeledPrice
 
+from telegram_bot.database.methods.other import is_admin
+from telegram_bot.database.methods.update import set_vip
 from telegram_bot.env import TgBot
-from telegram_bot.database.methods import set_vip, check_admin
-from telegram_bot.keyboards import KB_START_BOT
 from telegram_bot.handlers.user.user_bot import _process
 from telegram_bot.misc.util import get_main_keyboard
 
@@ -11,7 +11,7 @@ from telegram_bot.misc.util import get_main_keyboard
 async def __buy_vip(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
-    if check_admin(user_id):
+    if is_admin(user_id):
         await bot.send_message(user_id, 'Вы являетесь администратором, используйте настройку в Админ меню')
         return
     await bot.send_invoice(

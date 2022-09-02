@@ -8,8 +8,9 @@ from loguru import logger
 from pyrogram import Client
 from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, \
     ApiIdInvalid, PasswordHashInvalid
-
-from telegram_bot.database.methods import create_user_bot_session, get_user_by_id_telegram_id, delete_session
+from telegram_bot.database.methods.create import create_user_bot_session
+from telegram_bot.database.methods.delete import delete_session
+from telegram_bot.database.methods.get import get_user_by_id_telegram_id
 from telegram_bot.env import TgBot
 from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP
 from telegram_bot.misc import CreateUserBotState, start_user_bot
@@ -169,7 +170,6 @@ async def __stop_register_user_bot(msg: Message, state: FSMContext) -> None:
     user_id = msg.from_user.id
     await state.finish()
     await bot.send_message(user_id, "Авторизация юзер бота отменена!", reply_markup=get_main_keyboard(user_id, False))
-
 
 # endregion
 

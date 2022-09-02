@@ -2,7 +2,9 @@ from contextlib import suppress
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
-from telegram_bot.database.methods import set_admin, get_all_users, set_vip
+
+from telegram_bot.database.methods.get import get_all_users
+from telegram_bot.database.methods.update import set_admin, set_vip
 from telegram_bot.handlers.admin.auth import _get_auth_handlers
 from telegram_bot.handlers.admin.vip import _get_vip_handlers
 from telegram_bot.misc.states import AdminStates

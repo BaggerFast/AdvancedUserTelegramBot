@@ -2,7 +2,8 @@ from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 
-from telegram_bot.database.methods import set_admin, set_vip, check_admin
+from telegram_bot.database.methods.other import is_admin
+from telegram_bot.database.methods.update import set_admin, set_vip
 from telegram_bot.env import TgBot
 from telegram_bot.misc.states import AdminStates
 from telegram_bot.misc.util import get_main_keyboard, get_admin_keyboard
@@ -11,7 +12,7 @@ from telegram_bot.misc.util import get_main_keyboard, get_admin_keyboard
 async def __admin(msg: Message, state: FSMContext):
     bot = msg.bot
     user_id = msg.from_user.id
-    if check_admin(user_id):
+    if is_admin(user_id):
         await state.set_state(AdminStates.ADMIN)
         await bot.send_message(user_id, 'Вы админ', reply_markup=ReplyKeyboardRemove())
         await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))

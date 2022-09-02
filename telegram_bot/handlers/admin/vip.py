@@ -2,7 +2,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-from telegram_bot.database.methods import set_vip, switch_vip
+from telegram_bot.database.methods.other import is_vip, switch_vip
 from telegram_bot.misc.states import AdminStates
 from telegram_bot.misc.util import get_main_keyboard, get_admin_keyboard
 
@@ -25,7 +25,7 @@ async def __vip_insert_tg_id(msg: Message, state: FSMContext):
     other_user_id = int(msg.text)
     # todo remove Exception
     try:
-        set_vip(other_user_id)
+        is_vip(other_user_id)
         await state.finish()
         await bot.send_message(other_user_id, "Вам выдали vip доступ.",
                                reply_markup=get_main_keyboard(other_user_id, False))
