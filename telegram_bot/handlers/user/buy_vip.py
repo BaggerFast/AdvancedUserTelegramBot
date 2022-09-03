@@ -3,9 +3,9 @@ from aiogram.types import PreCheckoutQuery, ContentTypes, Message, LabeledPrice
 
 from telegram_bot.database.methods.other import is_admin
 from telegram_bot.database.methods.update import set_vip
-from telegram_bot.env import TgBot
-from telegram_bot.handlers.user.user_bot import _process
-from telegram_bot.misc.util import get_main_keyboard
+from telegram_bot.utils import Env, Config
+from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists, check_process
+from telegram_bot.utils.util import get_main_keyboard
 
 
 async def __buy_vip(msg: Message) -> None:
@@ -18,9 +18,9 @@ async def __buy_vip(msg: Message) -> None:
         chat_id=msg.chat.id,
         title="Vip",
         description="Описание",
-        provider_token=TgBot.PAYMENTS_TOKEN,
+        provider_token=Env.PAYMENTS_TOKEN,
         currency='rub',
-        prices=[LabeledPrice(label="Vip доступ", amount=30000)],
+        prices=[LabeledPrice(label="Vip доступ", amount=Config.PRICE*100)],
         start_parameter='True',
         payload='some_invoice',
         protect_content=True,
@@ -31,17 +31,10 @@ async def __on_success_buy(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     set_vip(user_id)
-    if user_id in _process:
-        process_bot = _process[user_id]
-        process_bot.kill()
-        del _process[user_id]
-
-        await bot.send_message(user_id, "Вы успешно оформили вип доступ!🥳\n"
-                                        "Запустите User бота заново, что-бы получить все возможности",
-                               reply_markup=get_main_keyboard(user_id, user_id in _process))
-    else:
-        await bot.send_message(msg.from_user.id, "Вы успешно оформили вип доступ!🥳\n",
-                               reply_markup=get_main_keyboard(user_id, user_id in _process))
+    kill_process(user_id)
+    start_process_if_sessions_exists(user_id)
+    await bot.send_message(user_id, "Вы успешно оформили вип доступ!🥳\n",
+                           reply_markup=get_main_keyboard(user_id))
 
 
 async def __check_oup_process(check_out_query: PreCheckoutQuery) -> None:
@@ -50,6 +43,6 @@ async def __check_oup_process(check_out_query: PreCheckoutQuery) -> None:
 
 
 def _register_vip_handlers(dp: Dispatcher) -> None:
-    dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию 💸")
+    dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию")
     dp.register_message_handler(__on_success_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
     dp.register_pre_checkout_query_handler(__check_oup_process, lambda _: True)

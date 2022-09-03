@@ -1,50 +1,11 @@
 from asyncio import sleep
+from random import choice, randint
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
-from user_bot.handlers.common.util import _get_heart_stickers
-from user_bot.misc import cmd, get_me_filters, play_stroke_anim
-
-
-@cmd(False)
-async def __russia(app: Client, msg: Message):
-    img = (
-        "⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️",
-        "⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️",
-        "🟦🟦🟦🟦🟦🟦🟦🟦",
-        "🟦🟦🟦🟦🟦🟦🟦🟦",
-        "🟥🟥🟥🟥🟥🟥🟥🟥",
-        "🟥🟥🟥🟥🟥🟥🟥🟥"
-    )
-    await play_stroke_anim(msg, img)
-
-
-@cmd(False)
-async def __germany(app: Client, msg: Message):
-    img = (
-        "⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️",
-        "⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️",
-        "🟥🟥🟥🟥🟥🟥🟥🟥",
-        "🟥🟥🟥🟥🟥🟥🟥🟥",
-        "🟨🟨🟨🟨🟨🟨🟨🟨",
-        "🟨🟨🟨🟨🟨🟨🟨🟨",
-    )
-    await play_stroke_anim(msg, img)
-
-
-@cmd(False)
-async def __ukraine(app: Client, msg: Message):
-    img = (
-        "🟦🟦🟦🟦🟦🟦🟦🟦",
-        "🟦🟦🟦🟦🟦🟦🟦🟦",
-        "🟦🟦🟦🟦🟦🟦🟦🟦",
-        "🟨🟨🟨🟨🟨🟨🟨🟨",
-        "🟨🟨🟨🟨🟨🟨🟨🟨",
-        "🟨🟨🟨🟨🟨🟨🟨🟨",
-    )
-    await play_stroke_anim(msg, img)
+from user_bot.utils import cmd, get_me_filters, play_stroke_anim
 
 
 @cmd(False)
@@ -96,49 +57,35 @@ async def __gubka(app: Client, msg: Message):
 
 
 @cmd(False)
-async def __like(app: Client, msg: Message):
-    img = (
-        "🟦🟦🟦🟦🟦🟦🟦🟦",
-        "🟦🟦🟦🟦⬜️🟦🟦🟦",
-        "🟦🟦⬜️⬜️⬜️🟦⬜️🟦",
-        "🟦🟦⬜️⬜️⬜️🟦⬜️🟦",
-        "🟦🟦⬜️⬜️⬜️🟦⬜️🟦",
-        "🟦🟦🟦🟦🟦🟦🟦🟦",
-    )
+async def __rabbit(app: Client, msg: Message):
+    left_eyes = '┈┃▋▏▋▏┃┈'
+    right_eyes = '┈┃╱▋╱▋┃┈'
+    img = [
+        '╭━━╮╭━━╮',
+        '╰━╮┃┃╭━╯',
+        '┈╭┛┗┛┗╮┈',
+        '┈┃╱▋╱▋┃┈',
+        '╭┛▔▃▔┈┗╮',
+        '╰┓╰┻━╯┏╯',
+        '╭┛┈┏┓┈┗╮',
+        '╰━━╯╰━━╯',
+    ]
+    eyes = choice((True, False))
+    img[3] = right_eyes if eyes else left_eyes
     await play_stroke_anim(msg, img)
+    await sleep(1)
 
-
-@cmd(False)
-async def __dislike(app: Client, msg: Message):
-    img = (
-        "🟥🟥🟥🟥🟥🟥🟥🟥",
-        "🟥🟥⬜️⬜️⬜️🟥⬜️🟥",
-        "🟥🟥⬜️⬜️⬜️🟥⬜️🟥",
-        "🟥⬜️⬜️⬜️⬜️🟥⬜️🟥",
-        "🟥🟥🟥🟥⬜️🟥🟥🟥",
-        "🟥🟥🟥🟥🟥🟥🟥🟥",
-    )
-    await play_stroke_anim(msg, img)
-
-
-@cmd(False)
-async def __heart(app: Client, msg: Message):
-    #todo: heart
-    img = _get_heart_stickers()
-    for anim in img:
-        await msg.edit('\n'.join(anim))
-        await sleep(0.2)
+    for i in range(randint(5, 10)):
+        eyes = not eyes
+        img[3] = right_eyes if eyes else left_eyes
+        await msg.edit('\n'.join(img))
+        await sleep(0.5)
 
 
 def _get_sticker_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__russia, filters=get_me_filters('russia')),
-        MessageHandler(__germany, filters=get_me_filters('germany')),
-        MessageHandler(__ukraine, filters=get_me_filters('ukraine')),
         MessageHandler(__steve, filters=get_me_filters('steve')),
         MessageHandler(__uno, filters=get_me_filters('uno')),
         MessageHandler(__gubka, filters=get_me_filters('gubka')),
-        MessageHandler(__like, filters=get_me_filters('like')),
-        MessageHandler(__dislike, filters=get_me_filters('dislike')),
-        MessageHandler(__heart, filters=get_me_filters('heart'))
+        MessageHandler(__rabbit, filters=get_me_filters('rabbit'))
     )

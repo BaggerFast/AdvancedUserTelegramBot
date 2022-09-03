@@ -1,24 +1,22 @@
 from contextlib import suppress
 from datetime import timedelta
-from subprocess import Popen
-
 from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 from loguru import logger
 from pyrogram import Client
-from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, \
-    ApiIdInvalid, PasswordHashInvalid
+from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, PasswordHashInvalid
+
 from telegram_bot.database.methods.create import create_session
 from telegram_bot.database.methods.delete import delete_session
 from telegram_bot.database.methods.get import get_user_by_id_telegram_id
-from telegram_bot.env import TgBot
+
+from telegram_bot.utils import Env, CreateUserBotState
+from telegram_bot.utils.util import get_main_keyboard
 from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP
-from telegram_bot.misc import CreateUserBotState, start_user_bot
-from telegram_bot.misc.util import get_main_keyboard
+from ...utils.process import start_process_if_sessions_exists, check_process, kill_process
 
 __sessions: dict[int, Client] = {}
-_process: dict[int, Popen] = {}
 
 
 # region with State
@@ -29,14 +27,13 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
 
     user = get_user_by_id_telegram_id(user_id)
 
-    if user_id in _process:
-        keyboard = get_main_keyboard(user_id, True)
+    if check_process(user_id):
+        keyboard = get_main_keyboard(user_id)
         await bot.send_message(user_id, "Ваш бот уже запущен!", reply_markup=keyboard)
         return
     if user and user.session:
-        process = start_user_bot(user.session.session, user_id, user.vip)
-        _process[user_id] = process
-        keyboard = get_main_keyboard(user_id, user_id in _process)
+        start_process_if_sessions_exists(user_id)
+        keyboard = get_main_keyboard(user_id)
         await state.finish()
         await bot.send_message(
             user_id,
@@ -57,8 +54,8 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
     with suppress(Exception):
         client = Client(
             name=str(msg.from_user.id),
-            api_id=TgBot.API_ID,
-            api_hash=TgBot.API_HASH,
+            api_id=Env.API_ID,
+            api_hash=Env.API_HASH,
             in_memory=True,
         )
         await client.connect()
@@ -68,7 +65,7 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
         logger.error(e)
         await bot.send_message(user_id, f"Не удалось отправить смс! ⚠️\n"
                                         f"Повторите попытку через - {timedelta(seconds=e.value)}",
-                               reply_markup=get_main_keyboard(user_id, False))
+                               reply_markup=get_main_keyboard(user_id))
         await state.finish()
         return
 
@@ -123,11 +120,10 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
 
     await client.disconnect()
 
-    start_user_bot(string_session, msg.from_user.id, user.vip)
-    _process[user_id] = start_user_bot(string_session, user_id, user.vip)
+    start_process_if_sessions_exists(user_id)
     del __sessions[user_id]
 
-    keyboard = get_main_keyboard(user_id, user_id in _process)
+    keyboard = get_main_keyboard(user_id)
     await bot.send_message(user_id, "User bot запущен ✅", reply_markup=keyboard)
     await state.finish()
 
@@ -150,10 +146,10 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
 
     await client.disconnect()
 
-    _process[user_id] = start_user_bot(string_session, user_id, user.vip)
+    start_process_if_sessions_exists(user_id)
     del (__sessions[user_id])
 
-    keyboard = get_main_keyboard(user_id, user_id in _process)
+    keyboard = get_main_keyboard(user_id)
 
     await msg.delete()
     await bot.send_message(user_id, "Бот запущен! ✅", reply_markup=keyboard)
@@ -164,7 +160,7 @@ async def __stop_register_user_bot(query: CallbackQuery, state: FSMContext) -> N
     bot: Bot = query.bot
     user_id = query.from_user.id
     await state.finish()
-    await bot.send_message(user_id, "Авторизация бота отменена! ❌", reply_markup=get_main_keyboard(user_id, False))
+    await bot.send_message(user_id, "Авторизация бота отменена! ❌", reply_markup=get_main_keyboard(user_id))
 
 
 # endregion
@@ -174,11 +170,9 @@ async def __stop_bot(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
 
-    if user_id in _process:
-        _process[user_id].kill()
-        del _process[user_id]
-
-        keyboard = get_main_keyboard(user_id, user_id in _process)
+    if check_process(user_id):
+        kill_process(user_id)
+        keyboard = get_main_keyboard(user_id)
         await bot.send_message(user_id, "Бот остановлен! ⚠️", reply_markup=keyboard)
 
 
@@ -186,10 +180,8 @@ async def __delete_session(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     delete_session(user_id)
-    if user_id in _process:
-        _process[user_id].kill()
-        del _process[user_id]
-    keyboard = get_main_keyboard(user_id, user_id in _process)
+    kill_process(user_id)
+    keyboard = get_main_keyboard(user_id)
     await bot.send_message(user_id, "Ваши данные удалены и User bot остановлен! ⚠️", reply_markup=keyboard)
 
 

@@ -5,12 +5,14 @@ from contextlib import suppress
 
 from pyrogram import filters, Client
 from pyrogram.types import Message
-from user_bot.misc.constants import VIP_STATUS, ADVERT_LINK
+
+from telegram_bot.utils import Config
+from user_bot.utils.constants import VIP_STATUS, ADVERT_LINK
 from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid
 
 
 def get_me_filters(command: str) -> bool:
-    return filters.me & filters.command(command, ".")
+    return filters.me & filters.command(command, Config.PREFIX)
 
 
 def cmd(auto_del: bool = True):
@@ -26,13 +28,11 @@ def cmd(auto_del: bool = True):
                 elif auto_del:
                     await sleep(3)
                     await msg.delete()
-
         return wrapper
-
     return input_func
 
 
-async def play_stroke_anim(msg: Message, anims: tuple[str, ...], tick: float | int = 0.1):
+async def play_stroke_anim(msg: Message, anims: tuple[str, ...] | list[str], tick: float | int = 0.1):
     for i in range(len(anims)):
         data = "\n".join(anims[0:i + 1])
         await msg.edit(data)

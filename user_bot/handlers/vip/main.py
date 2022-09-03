@@ -2,7 +2,10 @@ from asyncio import sleep
 from pyrogram.types import Message
 from pyrogram.handlers import MessageHandler
 
-from user_bot.misc import cmd, get_me_filters, VIP_STATUS
+from user_bot.handlers.vip.games import _get_game_vip_handlers
+from user_bot.handlers.vip.stickers import _get_sticker_vip_handlers
+from user_bot.handlers.vip.texts import _get_text_vip_handlers
+from user_bot.utils import cmd, get_me_filters, VIP_STATUS
 
 
 @cmd(False)
@@ -17,9 +20,14 @@ async def __bagger_fast(app, msg: Message):
         await sleep(0.1)
 
 
-def get_vip_handlers() -> list[MessageHandler]:
+def get_vip_handlers() -> tuple | tuple[MessageHandler]:
     if not VIP_STATUS:
-        return []
-    return [
+        return ()
+    return (
         MessageHandler(__bagger_fast, filters=get_me_filters('bf')),
-    ]
+
+        *_get_game_vip_handlers(),
+        *_get_text_vip_handlers(),
+        *_get_sticker_vip_handlers(),
+
+    )

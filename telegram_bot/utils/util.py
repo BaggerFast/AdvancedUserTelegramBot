@@ -1,20 +1,13 @@
 from copy import deepcopy
-from sys import executable
-from subprocess import Popen
-from aiogram.types import KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-from misc.path import PathManager
+from aiogram.types import KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 from telegram_bot.database.methods.get import get_user_by_id_telegram_id
-from telegram_bot.database.methods.other import is_vip
 from telegram_bot.keyboards import KB_STOP_BOT, KB_START_BOT
+from telegram_bot.utils.process import check_process
 
 
-def start_user_bot(string_session: str, telegram_id: int, vip_status: int = 0):
-    return Popen([executable, PathManager.get("user_bot/main.py"), string_session, f'{telegram_id}', f'{vip_status}'])
-
-
-def get_main_keyboard(user_id: int, in_process: bool):
+def get_main_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     user = get_user_by_id_telegram_id(user_id)
-    kb = deepcopy(KB_STOP_BOT if in_process else KB_START_BOT)
+    kb = deepcopy(KB_STOP_BOT if check_process(user_id) else KB_START_BOT)
     if user and user.session:
         kb.add(KeyboardButton(text="Удалить свои данные ⚠️"))
     kb.add("Узнать комманды 📌")
@@ -24,11 +17,10 @@ def get_main_keyboard(user_id: int, in_process: bool):
         kb.add("Тех-поддержка ⚙")
     if user and user.admin:
         kb.add(KeyboardButton(text="Admin 🤡"))
-
     return kb
 
 
-def get_admin_keyboard(user_id: int):
+def get_admin_keyboard(user_id: int) -> InlineKeyboardMarkup:
     # todo: fix Exception
     user = get_user_by_id_telegram_id(user_id)
     if not user.admin:

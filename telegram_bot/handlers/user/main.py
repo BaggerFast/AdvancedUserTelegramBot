@@ -1,11 +1,12 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message
 
+from misc import get_vip_commands_help, get_commands_help
 from telegram_bot.handlers.user.user_bot import _register_user_bot_handlers
 from telegram_bot.handlers.user.buy_vip import _register_vip_handlers
-from .user_bot import _process
 from ...database.methods.create import create_user
-from ...misc.util import get_main_keyboard
+from ...utils import Config
+from ...utils.util import get_main_keyboard
 from ...keyboards import KB_INFO
 
 
@@ -13,7 +14,7 @@ async def __start(msg: Message) -> None:
     create_user(msg.from_user.id)
     bot: Bot = msg.bot
     user_id = msg.from_user.id
-    keyboard = get_main_keyboard(user_id, user_id in _process)
+    keyboard = get_main_keyboard(user_id)
     await bot.send_message(user_id, f"Привет, <b>{msg.from_user.first_name}</b>!\n"
                                     f"Это <b>лучший</b> юзер бот с анимациями!😎", reply_markup=keyboard,
                            parse_mode="HTML")
@@ -21,7 +22,7 @@ async def __start(msg: Message) -> None:
 
 async def __teh_support(msg: Message):
     bot: Bot = msg.bot
-    await bot.send_message(msg.from_user.id, "Если у вас возникли проблемы. Напишите нам - @Gamlet_Omlet")
+    await bot.send_message(msg.from_user.id, f"Если у вас возникли проблемы. Напишите нам - {Config.HELPER}")
 
 
 async def __help(msg: Message):
@@ -31,15 +32,19 @@ async def __help(msg: Message):
 
 async def __vip_commands(msg: Message):
     bot: Bot = msg.bot
-    message = "Все VIP комманды:\n" \
-              ".kill"
+    commands = sorted(get_vip_commands_help())
+    message = "Все <b>VIP</b> команды:\n\n"
+    for cmd in commands:
+        message += f'{Config.PREFIX}<b><i>{cmd.lower()}</i></b>\n'
     await bot.send_message(msg.from_user.id, message)
 
 
 async def __free_commands(msg: Message):
     bot: Bot = msg.bot
-    message = "Все FREE комманды:\n" \
-              ".stupid"
+    commands = sorted(get_commands_help())
+    message = "Все <b>FREE</b> команды:\n\n"
+    for cmd in commands:
+        message += f'{Config.PREFIX}<b><i>{cmd.lower()}</i></b>\n'
     await bot.send_message(msg.from_user.id, message)
 
 

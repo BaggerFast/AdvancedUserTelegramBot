@@ -6,32 +6,9 @@ from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
 from user_bot.handlers.common.games import _get_game_handlers
-from user_bot.misc import get_me_filters, cmd, play_anim
+from user_bot.utils import get_me_filters, cmd, play_anim
 from user_bot.handlers.common.stickers import _get_sticker_handlers
 from user_bot.handlers.common.texts import _get_text_handlers
-
-
-@cmd(False)
-async def __kill(app, msg: Message):
-    await msg.edit("<b>🔪 На тебя заказали убийство.</b>")  # red
-    await sleep(3)
-    await msg.edit(f"<b>👀 У тебя есть пару секунд чтобы спрятаться.</b>")  # orange
-    await sleep(2)
-
-    for i in range(5, 0, -1):
-        await msg.edit(f"<b>⏳ [ {i}s ]</b>")
-        await sleep(1)
-
-    await msg.edit(f"<b>🔪 Убийца вышел на твои поиски, надеюсь ты хорошо спрятался</b>")
-    await sleep(1)
-
-    for i in range(6):
-        await msg.edit(f"<b>👀 Поиск{'.' * (i % 3 + 1)}</b>")
-        await sleep(0.5)
-
-    kill = ["Убийца нашел тебя, к сожалению ты спрятался плохо и был убит",
-            "⚔️Убийца не нашел тебя, вы  очень хорошо спрятались"]
-    await msg.edit(f'<b>{choice(kill)}.</b>')
 
 
 @cmd(False)
@@ -113,7 +90,6 @@ async def __compli(app: Client, msg: Message):
 def get_common_handlers() -> tuple[MessageHandler, ...]:
     return (
         MessageHandler(__bombs, filters=get_me_filters('bombs')),
-        MessageHandler(__kill, filters=get_me_filters('kill')),
         MessageHandler(__night, filters=get_me_filters('night')),
         MessageHandler(__stupid, filters=get_me_filters('stupid')),
         MessageHandler(__compli, filters=get_me_filters('compli')),

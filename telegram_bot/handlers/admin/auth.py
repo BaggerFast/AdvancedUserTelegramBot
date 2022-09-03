@@ -4,9 +4,9 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 
 from telegram_bot.database.methods.other import is_admin
 from telegram_bot.database.methods.update import set_admin, set_vip
-from telegram_bot.env import TgBot
-from telegram_bot.misc.states import AdminStates
-from telegram_bot.misc.util import get_main_keyboard, get_admin_keyboard
+from telegram_bot.utils.env import Env
+from telegram_bot.utils.states import AdminStates
+from telegram_bot.utils.util import get_main_keyboard, get_admin_keyboard
 
 
 async def __admin(msg: Message, state: FSMContext):
@@ -22,10 +22,10 @@ async def __admin(msg: Message, state: FSMContext):
 async def __admin_auth(msg: Message, state: FSMContext):
     bot: Bot = msg.bot
     user_id = msg.from_user.id
-    if user_id == TgBot.ADMIN_ID:
+    if user_id == Env.ADMIN_ID:
         set_admin(user_id)
         set_vip(user_id)
-        await bot.send_message(user_id, "Добро пожаловать хозяин! 😜", reply_markup=get_main_keyboard(user_id, False))
+        await bot.send_message(user_id, "Добро пожаловать хозяин! 😜", reply_markup=get_main_keyboard(user_id))
 
 
 async def __admin_exit(msg: CallbackQuery, state: FSMContext):
@@ -33,7 +33,7 @@ async def __admin_exit(msg: CallbackQuery, state: FSMContext):
     user_id = msg.from_user.id
     await state.finish()
     await bot.send_message(user_id, "Вы вышли из панели администратора ⚠️",
-                           reply_markup=get_main_keyboard(user_id, False))
+                           reply_markup=get_main_keyboard(user_id))
 
 
 async def __cancel(msg: Message, state: FSMContext):
