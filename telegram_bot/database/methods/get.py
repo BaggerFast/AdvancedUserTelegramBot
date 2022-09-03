@@ -11,12 +11,9 @@ def get_user_by_id_telegram_id(telegram_id: int) -> User | None:
         return None
 
 
-def get_users_with_sessions() -> list[tuple[User]]:
-    select_query = select(User).where(User.session)
-    return Database().session.execute(select_query).fetchall()
+def get_users_with_sessions() -> list:
+    return Database().session.query(User).filter(User.session).all()
 
 
 def get_all_telegram_id() -> list[tuple[int]]:
-    session = Database().session
-    select_query = select(User.telegram_id)
-    return session.execute(select_query).fetchall()
+    return Database().session.query(User.telegram_id).all()

@@ -13,15 +13,18 @@ def start_user_bot(string_session: str, telegram_id: int, vip_status: int = 0):
 
 
 def get_main_keyboard(user_id: int, in_process: bool):
-    vip = is_vip(user_id)
     user = get_user_by_id_telegram_id(user_id)
     kb = deepcopy(KB_STOP_BOT if in_process else KB_START_BOT)
-    if user.admin:
-        kb.add(KeyboardButton(text="Admin 🤡"))
     if user and user.session:
         kb.add(KeyboardButton(text="Удалить свои данные ⚠️"))
-    if not vip and not user.admin:
+    kb.add("Узнать комманды 📌")
+    if not user.vip and not user.admin:
         kb.add(KeyboardButton(text="Купить полную версию 💸"))
+    if not user.admin:
+        kb.add("Тех-поддержка ⚙")
+    if user and user.admin:
+        kb.add(KeyboardButton(text="Admin 🤡"))
+
     return kb
 
 

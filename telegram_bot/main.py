@@ -26,12 +26,12 @@ async def __on_start_up(dp: Dispatcher) -> None:
         return
 
     for key in users:
-        user = key[0]
+        usr = key
         with suppress(ChatNotFound, BotBlocked):
             await dp.bot.send_message(
-                user.telegram_id,
+                usr.telegram_id,
                 "Бот обновлен, запустите его заново! ⚠️",
-                reply_markup=get_main_keyboard(user.telegram_id, False)
+                reply_markup=get_main_keyboard(usr.telegram_id, False)
             )
             count += 1
     logger.info(f"Было совершено {count} рассылок")

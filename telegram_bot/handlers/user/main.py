@@ -18,7 +18,13 @@ async def __start(msg: Message) -> None:
                            parse_mode="HTML")
 
 
+async def __teh_support(msg: Message):
+    bot: Bot = msg.bot
+    await bot.send_message(msg.from_user.id, "Если у вас возникли проблемы. Напишите нам - @Gamlet_Omlet")
+
+
 def register_users_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__start, commands=["start"])
+    dp.register_message_handler(__teh_support, content_types=["text"], text="Тех-поддержка ⚙", state=None)
     _register_vip_handlers(dp)
     _register_user_bot_handlers(dp)

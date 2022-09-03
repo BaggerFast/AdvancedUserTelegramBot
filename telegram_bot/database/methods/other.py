@@ -7,17 +7,12 @@ from telegram_bot.database.models import User
 
 
 def is_vip(telegram_id) -> bool:
-    select_query = select(User.vip).where(User.telegram_id == telegram_id)
-    result = bool(Database().session.execute(select_query).fetchone()[0])
-    return result
+    return bool(Database().session.query(User.vip).filter(User.telegram_id == telegram_id).one()[0])
 
 
 def is_admin(telegram_id: int) -> bool:
     create_user(telegram_id)
-    select_query = select(User.admin).where(User.telegram_id == telegram_id)
-    session = Database().session
-    result = session.execute(select_query).fetchone()
-    return bool(result[0])
+    return bool(Database().session.query(User.admin).filter(User.telegram_id == telegram_id).one()[0])
 
 
 def switch_vip(telegram_id: int):
