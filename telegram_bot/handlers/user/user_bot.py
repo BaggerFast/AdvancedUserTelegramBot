@@ -9,7 +9,7 @@ from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, 
 
 from telegram_bot.database.methods.create import create_session
 from telegram_bot.database.methods.delete import delete_session
-from telegram_bot.database.methods.get import get_user_by_id_telegram_id
+from telegram_bot.database.methods.get import get_user_by_telegram_id
 
 from telegram_bot.utils import Env, CreateUserBotState
 from telegram_bot.utils.util import get_main_keyboard
@@ -25,7 +25,7 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
 
-    user = get_user_by_id_telegram_id(user_id)
+    user = get_user_by_telegram_id(user_id)
 
     if check_process(user_id):
         keyboard = get_main_keyboard(user_id)
@@ -115,7 +115,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
 
     string_session = await client.export_session_string()
 
-    if user := get_user_by_id_telegram_id(user_id):
+    if user := get_user_by_telegram_id(user_id):
         create_session(user, string_session)
 
     await client.disconnect()
@@ -141,7 +141,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
 
     string_session = await client.export_session_string()
 
-    if user := get_user_by_id_telegram_id(msg.from_user.id):
+    if user := get_user_by_telegram_id(msg.from_user.id):
         create_session(user, string_session)
 
     await client.disconnect()

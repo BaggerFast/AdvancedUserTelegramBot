@@ -2,7 +2,7 @@ from sqlalchemy import select
 
 from telegram_bot.database.main import Database
 from telegram_bot.database.methods.create import create_user
-from telegram_bot.database.methods.get import get_user_by_id_telegram_id
+from telegram_bot.database.methods.get import get_user_by_telegram_id
 from telegram_bot.database.models import User
 
 
@@ -16,7 +16,7 @@ def is_admin(telegram_id: int) -> bool:
 
 
 def switch_vip(telegram_id: int):
-    user = get_user_by_id_telegram_id(telegram_id)
+    user = get_user_by_telegram_id(telegram_id)
     if user:
         user.vip = not user.vip
         Database().session.commit()

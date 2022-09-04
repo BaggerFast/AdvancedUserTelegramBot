@@ -3,7 +3,7 @@ from aiogram.types import PreCheckoutQuery, ContentTypes, Message, LabeledPrice
 
 from telegram_bot.database.methods.other import is_admin
 from telegram_bot.database.methods.update import set_vip
-from telegram_bot.utils import Env, Config
+from telegram_bot.utils import Env, TgConfig
 from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists, check_process
 from telegram_bot.utils.util import get_main_keyboard
 
@@ -14,7 +14,7 @@ async def __buy_vip(msg: Message) -> None:
     if is_admin(user_id):
         await bot.send_message(user_id, 'Вы являетесь администратором, используйте настройку в Админ меню')
         return
-    price = Config.PRICE*100
+    price = TgConfig.PRICE * 100
     await bot.send_invoice(
         chat_id=msg.chat.id,
         title="Vip",

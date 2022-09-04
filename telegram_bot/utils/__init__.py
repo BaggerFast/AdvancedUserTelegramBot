@@ -1,5 +1,5 @@
 from .env import Env
-from .config import Config
+from .config import TgConfig
 from .states import CreateUserBotState
 
 

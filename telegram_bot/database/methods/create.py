@@ -16,5 +16,5 @@ def create_user(telegram_id: int) -> None:
 
 def create_session(user: User, user_bot_session: str) -> None:
     session = Database().session
-    session.add(Session(user_id=user.id, session=user_bot_session))
+    session.add(Session(user_id=user.id, string=user_bot_session))
     session.commit()

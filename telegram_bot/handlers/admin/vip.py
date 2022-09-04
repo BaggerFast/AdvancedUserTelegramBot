@@ -1,10 +1,11 @@
+import loguru
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from telegram_bot.database.methods.other import switch_vip
 from telegram_bot.database.methods.update import set_vip
-from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
+from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists, check_process
 from telegram_bot.utils.states import AdminStates
 from telegram_bot.utils.util import get_main_keyboard, get_admin_keyboard
 
@@ -30,10 +31,14 @@ async def __vip_insert_tg_id(msg: Message, state: FSMContext):
     # todo remove Exception
     try:
         set_vip(other_user_id)
+        if check_process(user_id):
+            kill_process(user_id)
+            start_process_if_sessions_exists(user_id)
         await state.finish()
         await bot.send_message(other_user_id, "Администратор выдал вам vip доступ. ✨",
                                reply_markup=get_main_keyboard(other_user_id))
-        await bot.send_message(user_id, "Успешно ✅")
+        await bot.send_message(user_id, "Успешно: выдан VIP доступ ✅")
+        loguru.logger.info(f'{other_user_id} got VIP access from {user_id}')
     except Exception:
         await bot.send_message(user_id, "Произошел сбой ⚠️")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))

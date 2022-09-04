@@ -6,13 +6,14 @@ from contextlib import suppress
 from pyrogram import filters, Client
 from pyrogram.types import Message
 
-from telegram_bot.utils import Config
-from user_bot.utils.constants import VIP_STATUS, ADVERT_LINK
 from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid
+
+from telegram_bot.utils import TgConfig
+from user_bot.utils.config import UserConfig
 
 
 def get_me_filters(command: str) -> bool:
-    return filters.me & filters.command(command, Config.PREFIX)
+    return filters.me & filters.command(command, TgConfig.PREFIX)
 
 
 def cmd(auto_del: bool = True):
@@ -21,9 +22,9 @@ def cmd(auto_del: bool = True):
         async def wrapper(app: Client, msg: Message):
             with suppress(MessageIdInvalid):
                 await handler(app, msg)
-                if not VIP_STATUS:
+                if not UserConfig.VIP_STATUS:
                     await sleep(3)
-                    await msg.edit(f'<b>By userbot</b> - <a href="{ADVERT_LINK}">Ссылка</a>')
+                    await msg.edit(f'<b>By userbot</b> - <a href="{UserConfig.ADVERT_LINK}">Ссылка</a>')
                     await msg.delete(revoke=False)
                 elif auto_del:
                     await sleep(3)

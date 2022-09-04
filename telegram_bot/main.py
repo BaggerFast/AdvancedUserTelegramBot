@@ -9,6 +9,7 @@ from telegram_bot.database.methods.get import get_users_with_sessions
 from telegram_bot.utils.env import Env
 from telegram_bot.database import register_models
 from telegram_bot.handlers import register_users_handlers, register_admin_handlers, register_other_handlers
+from telegram_bot.utils.process import start_process_if_sessions_exists
 from telegram_bot.utils.util import get_main_keyboard
 
 
@@ -25,14 +26,12 @@ async def __on_start_up(dp: Dispatcher) -> None:
         logger.info("В базе никого нет, я хочу плакать. У меня дипрессия и мне одиноко!")
         return
 
-    for key in users:
-        usr = key
+    for user in users:
         with suppress(ChatNotFound, BotBlocked):
-            await dp.bot.send_message(
-                usr.telegram_id,
-                "Бот обновлен, запустите его заново! ⚠️",
-                reply_markup=get_main_keyboard(usr.telegram_id)
-            )
+            if user.session.enable:
+                start_process_if_sessions_exists(user.telegram_id)
+            await dp.bot.send_message(user.telegram_id, "Бот обновлен!",
+                                      reply_markup=get_main_keyboard(user.telegram_id))
             count += 1
     logger.info(f"Было совершено {count} рассылок")
 

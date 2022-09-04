@@ -1,9 +1,12 @@
 from contextlib import suppress
+
+import loguru
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 
-from telegram_bot.database.methods.get import get_all_telegram_id
+from telegram_bot.database.methods.get import get_all_telegram_id, \
+    get_sessions_enable_count, get_user_count, get_sessions_count
 from telegram_bot.database.methods.update import set_admin, set_vip
 from telegram_bot.handlers.admin.auth import _get_auth_handlers
 from telegram_bot.handlers.admin.vip import _get_vip_handlers
@@ -28,9 +31,9 @@ async def __admin_insert_tg_id(msg: Message, state: FSMContext):
         set_admin(admin_id)
         set_vip(admin_id)
         await state.finish()
-        await bot.send_message(admin_id, "Вас назначили администратором.🥳\n",
-                               reply_markup=get_main_keyboard(admin_id))
-        await bot.send_message(user_id, "Успешно ✅")
+        await bot.send_message(admin_id, "Вас назначили администратором.🥳\n", reply_markup=get_main_keyboard(admin_id))
+        await bot.send_message(user_id, "Успешно: выдана ADMIN доступ ✅")
+        loguru.logger.info(f'{admin_id} got ADMIN access from {user_id}')
     except Exception:
         await bot.send_message(user_id, "Админка не выдана. Произошел сбой ⚠️")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
@@ -66,6 +69,31 @@ async def __do_advertising(query: Message, state: FSMContext):
 
 # endregion
 
+# region Analytics
+
+async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
+    bot: Bot = query.bot
+    user_id = query.from_user.id
+
+    users_count = get_user_count()
+    user_session_count = get_sessions_count()
+    vip_session_enable_count = get_sessions_enable_count(True)
+    free_session_enable_count = get_sessions_enable_count(False)
+    session_enable_count = vip_session_enable_count + free_session_enable_count
+
+    text = (
+        '<b>Отчет:</b>\n',
+        f'Кол-во пользователей: {users_count}',
+        f'Кол-во сессий: {user_session_count}\n',
+        f'VIP онлайн: {vip_session_enable_count}',
+        f'Free онлайн: {free_session_enable_count}',
+        f'Total онлайн: {session_enable_count}',
+    )
+    await bot.send_message(user_id, '\n'.join(text))
+
+
+# endregion
+
 
 def register_admin_handlers(dp: Dispatcher) -> None:
     _get_auth_handlers(dp)
@@ -76,3 +104,6 @@ def register_admin_handlers(dp: Dispatcher) -> None:
 
     dp.register_callback_query_handler(__advertising, lambda c: c.data == "advertising", state=AdminStates.ADMIN)
     dp.register_message_handler(__do_advertising, content_types=['text'], state=AdminStates.INSERT_ADVERT_TEXT)
+
+    dp.register_callback_query_handler(__analytic, lambda c: c.data == "analytics", state=AdminStates.ADMIN)
+

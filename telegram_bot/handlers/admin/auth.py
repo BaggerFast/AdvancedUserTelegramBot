@@ -13,7 +13,6 @@ async def __admin(msg: Message, state: FSMContext):
     bot = msg.bot
     user_id = msg.from_user.id
     if is_admin(user_id):
-        # todo: think
         await state.set_state(AdminStates.ADMIN)
         await bot.send_message(user_id, 'Вы админ 😎', reply_markup=ReplyKeyboardRemove())
         await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
