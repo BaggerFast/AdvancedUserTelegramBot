@@ -12,3 +12,7 @@ def set_vip(telegram_id: int) -> None:
 def set_admin(telegram_id: int) -> None:
     Database().session.query(User).filter(User.telegram_id == telegram_id).update(values={User.admin: 1})
     Database().session.commit()
+
+
+def update_enable(telegram_id, enable):
+    Database().session.query(User).filter(User.telegram_id == telegram_id).update(values={User.session.enable: enable})

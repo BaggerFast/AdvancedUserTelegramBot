@@ -14,13 +14,14 @@ async def __buy_vip(msg: Message) -> None:
     if is_admin(user_id):
         await bot.send_message(user_id, 'Вы являетесь администратором, используйте настройку в Админ меню')
         return
+    price = Config.PRICE*100
     await bot.send_invoice(
         chat_id=msg.chat.id,
         title="Vip",
         description="Описание",
         provider_token=Env.PAYMENTS_TOKEN,
         currency='rub',
-        prices=[LabeledPrice(label="Vip доступ", amount=Config.PRICE*100)],
+        prices=[LabeledPrice(label="Vip доступ", amount=price)],
         start_parameter='True',
         payload='some_invoice',
         protect_content=True,
@@ -43,6 +44,6 @@ async def __check_oup_process(check_out_query: PreCheckoutQuery) -> None:
 
 
 def _register_vip_handlers(dp: Dispatcher) -> None:
-    dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию")
+    dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию 💸")
     dp.register_message_handler(__on_success_buy, content_types=ContentTypes.SUCCESSFUL_PAYMENT)
     dp.register_pre_checkout_query_handler(__check_oup_process, lambda _: True)

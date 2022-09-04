@@ -19,7 +19,8 @@ class Session(Database.BASE):
     __tablename__ = 'SESSION'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('USER.id', ondelete='CASCADE'), unique=True)
-    session = Column(String, nullable=False)
+    string = Column(String, nullable=False)
+    enable = Column(Integer, default=0)
 
 
 def register_models():
