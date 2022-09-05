@@ -7,6 +7,7 @@ from loguru import logger
 from pyrogram import Client
 from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, PasswordHashInvalid
 
+from misc.path import PathManager
 from telegram_bot.database.methods.create import create_session
 from telegram_bot.database.methods.delete import delete_session
 from telegram_bot.database.methods.get import get_user_by_telegram_id
@@ -41,9 +42,10 @@ async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
             reply_markup=keyboard
         )
         return
-    await bot.send_message(user_id, "Отмена авторизации - Отменить",
-                           reply_markup=KB_CONTACT)
-    await bot.send_message(user_id, "❗️ Предоставьте доступ к вашему контакту ❗️", reply_markup=KB_CANCEL_SETUP)
+
+    await bot.send_document(user_id, open(PathManager.get('UserAgreement.pdf'), 'rb'), reply_markup=KB_CONTACT)
+    await bot.send_message(user_id, "Отправляя контакт, вы соглашаетесь с пользовательским соглашением!️",
+                           reply_markup=KB_CANCEL_SETUP)
     await state.set_state(CreateUserBotState.PHONE)
 
 

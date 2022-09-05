@@ -1,6 +1,7 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import PreCheckoutQuery, ContentTypes, Message, LabeledPrice
 
+from misc.path import PathManager
 from telegram_bot.database.methods.other import is_admin
 from telegram_bot.database.methods.update import set_vip
 from telegram_bot.utils import Env, TgConfig
