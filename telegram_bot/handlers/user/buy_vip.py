@@ -1,16 +1,13 @@
-import uuid
-
+from pprint import pprint
 from aiogram import Dispatcher, Bot
-from aiogram.types import PreCheckoutQuery, ContentTypes, Message, LabeledPrice
+from aiogram.types import Message
 from loguru import logger
 from yookassa import Payment
-
-from telegram_bot.database.main import Database
+from uuid import uuid4
 from telegram_bot.database.methods.create import create_user_payment
 from telegram_bot.database.methods.get import get_user_by_telegram_id
-from telegram_bot.database.methods.other import is_admin
 from telegram_bot.database.methods.update import set_vip
-from telegram_bot.utils import Env, TgConfig
+from telegram_bot.utils import TgConfig
 from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
 from telegram_bot.utils.util import get_main_keyboard, get_payment_keyboard, get_payment_info
 
@@ -19,30 +16,33 @@ async def __buy_vip(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     user = get_user_by_telegram_id(user_id)
+
     if user.vip:
         await bot.send_message(user_id, 'Вы уже приобрели vip доступ')
+        return
     if user.admin:
         await bot.send_message(user_id, 'Вы являетесь администратором, используйте настройку в Админ меню')
         return
+
+    pay_id = user.payment.key if user.payment else f'{uuid4()}'
+    payment = Payment.create(get_payment_info(), pay_id)
     if user and not user.payment:
-        create_user_payment(user, str(uuid.uuid4()))
-    payment = Payment.create(get_payment_info(), user.payment.key)
-    if  payment.status != 'succeeded':
+        create_user_payment(user, payment.id)
+    if payment.status != 'succeeded':
         keyboard = get_payment_keyboard(payment.confirmation.confirmation_url)
         await bot.send_message(user_id, f'Вы приобретаете <b>VIP</b> доступ.\nК оплате <b>{TgConfig.PRICE}</b> рублей',
-                                   reply_markup=keyboard)
-        return
-    keyboard = get_payment_keyboard('https://github.com/Bagger-sTeam')
-    await bot.send_message(user_id, f'Вы приобретаете <b>VIP</b> доступ.\nК оплате <b>{TgConfig.PRICE}</b> рублей',
-                           reply_markup=keyboard)
+                               reply_markup=keyboard)
+    else:
+        keyboard = get_payment_keyboard()
+        await bot.send_message(user_id, f'<b>VIP</b> доступ уже оплачен. Проверьте оплату', reply_markup=keyboard)
 
 
 async def __check_buy(msg: Message) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     user = get_user_by_telegram_id(user_id)
-    payment_status = Payment.find_one(user.payment.key)
-    if payment_status == 'succeeded':
+    payment = Payment.find_one(user.payment.key)
+    if payment.status == 'succeeded':
         set_vip(user_id)
         kill_process(user_id)
         start_process_if_sessions_exists(user_id)
