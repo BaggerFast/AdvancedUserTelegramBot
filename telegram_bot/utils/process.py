@@ -10,7 +10,7 @@ __process: dict[int, Popen] = {}
 
 def start_process_if_sessions_exists(telegram_id: int) -> None:
     user = get_user_by_telegram_id(telegram_id)
-    user_bot_app = PathManager.get("user_bot/main.py")
+    user_bot_app = PathManager.get("run_user_bot.py")
     if not (user and user.session):
         return
     update_session_status(telegram_id, 1)

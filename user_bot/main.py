@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import sys
 from pyrogram import Client
 from user_bot.handlers import get_common_handlers, get_vip_handlers
@@ -13,7 +12,7 @@ def __register_all_handlers(client: Client) -> None:
         client.add_handler(handler)
 
 
-def main() -> None:
+def start_user_bot() -> None:
     string_session = sys.argv[1]
     telegram_id = sys.argv[2]
     client = Client(
@@ -23,7 +22,3 @@ def main() -> None:
     )
     __register_all_handlers(client)
     client.run()
-
-
-if __name__ == "__main__":
-    main()
