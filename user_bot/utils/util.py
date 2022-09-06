@@ -24,7 +24,7 @@ def cmd(auto_del: bool = True):
                 await handler(app, msg)
                 if not UserConfig.VIP_STATUS:
                     await sleep(3)
-                    await msg.edit(f'<b>By userbot</b> - <a href="{UserConfig.ADVERT_LINK}">Ссылка</a>')
+                    await msg.edit(f'<b>By userbot</b> - <a href="{TgConfig.BOT_URL}">Ссылка</a>')
                     await msg.delete(revoke=False)
                 elif auto_del:
                     await sleep(3)

@@ -9,6 +9,4 @@ KB_STOP_BOT.add(KeyboardButton(text="Остановить бота ❌"))
 
 
 KB_CONTACT: Final = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-KB_CONTACT.add(
-    KeyboardButton("Отправить контакт 📞", request_contact=True)
-)
+KB_CONTACT.add(KeyboardButton("Отправить контакт 📞", request_contact=True))

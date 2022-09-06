@@ -13,7 +13,7 @@ def __register_all_handlers(client: Client) -> None:
         client.add_handler(handler)
 
 
-def main():
+def main() -> None:
     string_session = sys.argv[1]
     telegram_id = sys.argv[2]
     client = Client(

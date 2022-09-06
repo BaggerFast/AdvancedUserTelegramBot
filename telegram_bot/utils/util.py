@@ -2,6 +2,7 @@ from copy import deepcopy
 from aiogram.types import KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 from telegram_bot.database.methods.get import get_user_by_telegram_id
 from telegram_bot.keyboards import KB_STOP_BOT, KB_START_BOT
+from telegram_bot.utils import TgConfig
 from telegram_bot.utils.process import check_process
 
 
@@ -24,7 +25,7 @@ def get_admin_keyboard(user_id: int) -> InlineKeyboardMarkup:
     # todo: fix Exception
     user = get_user_by_telegram_id(user_id)
     if not user.admin:
-        raise Exception
+        raise Exception()
     kb = InlineKeyboardMarkup(1)
     kb.add(
         InlineKeyboardButton("Добавить администратора ➕", callback_data="add_admin"),
@@ -35,3 +36,27 @@ def get_admin_keyboard(user_id: int) -> InlineKeyboardMarkup:
         InlineKeyboardButton("Выйти ⛔️", callback_data="admin_exit"),
     )
     return kb
+
+
+def get_payment_keyboard(link: str) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(1)
+    kb.add(
+        InlineKeyboardButton("Оплатить", url=link),
+        InlineKeyboardButton("Проверить оплату", callback_data="check_payment"),
+    )
+    return kb
+
+
+def get_payment_info() -> dict:
+    return {
+        "amount": {
+            "value": f"{TgConfig.PRICE}.00",
+            "currency": "RUB"
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": TgConfig.BOT_URL,
+        },
+        "capture": True,
+        "description": "EmojiBot - подключение Vip доступа"
+    }

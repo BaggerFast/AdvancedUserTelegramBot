@@ -10,6 +10,7 @@ from telegram_bot.database.methods.get import get_all_telegram_id, \
 from telegram_bot.database.methods.update import set_admin, set_vip
 from telegram_bot.handlers.admin.auth import _get_auth_handlers
 from telegram_bot.handlers.admin.vip import _get_vip_handlers
+from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
 from telegram_bot.utils.states import AdminStates
 from telegram_bot.utils.util import get_main_keyboard, get_admin_keyboard
 
@@ -30,6 +31,8 @@ async def __admin_insert_tg_id(msg: Message, state: FSMContext):
     try:
         set_admin(admin_id)
         set_vip(admin_id)
+        kill_process(admin_id)
+        start_process_if_sessions_exists(admin_id)
         await state.finish()
         await bot.send_message(admin_id, "Вас назначили администратором.🥳\n", reply_markup=get_main_keyboard(admin_id))
         await bot.send_message(user_id, "Успешно: выдана ADMIN доступ ✅")

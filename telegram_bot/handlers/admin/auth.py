@@ -5,6 +5,7 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from telegram_bot.database.methods.other import is_admin
 from telegram_bot.database.methods.update import set_admin, set_vip
 from telegram_bot.utils.env import Env
+from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
 from telegram_bot.utils.states import AdminStates
 from telegram_bot.utils.util import get_main_keyboard, get_admin_keyboard
 
@@ -24,6 +25,8 @@ async def __admin_auth(msg: Message, state: FSMContext):
     if user_id == Env.ADMIN_ID:
         set_admin(user_id)
         set_vip(user_id)
+        kill_process(user_id)
+        start_process_if_sessions_exists(user_id)
         await bot.send_message(user_id, "Добро пожаловать хозяин! 😜", reply_markup=get_main_keyboard(user_id))
 
 
