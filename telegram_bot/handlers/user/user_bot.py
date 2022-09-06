@@ -149,7 +149,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     await client.disconnect()
 
     start_process_if_sessions_exists(user_id)
-    del (__sessions[user_id])
+    del __sessions[user_id]
 
     keyboard = get_main_keyboard(user_id)
 

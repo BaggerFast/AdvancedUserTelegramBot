@@ -17,7 +17,7 @@ async def __tik_tac_toe(app: Client, msg: Message):
         ["〰️", "〰️", "〰️"],
     ]
     sign = False
-    for i in range(9):
+    for _ in range(9):
         data = []
 
         rand_x, rand_y = randint(0, 2), randint(0, 2)
@@ -39,7 +39,7 @@ async def __tik_tac_toe(app: Client, msg: Message):
 
         sign = not sign
 
-    await app.send_message(msg.chat.id, f'У вас: Ничья')
+    await app.send_message(msg.chat.id, 'У вас: Ничья')
 
 
 @cmd(False)

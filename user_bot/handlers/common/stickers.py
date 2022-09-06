@@ -75,7 +75,7 @@ async def __rabbit(app: Client, msg: Message):
     await play_stroke_anim(msg, img)
     await sleep(1)
 
-    for i in range(randint(5, 10)):
+    for _ in range(randint(5, 10)):
         eyes = not eyes
         img[3] = right_eyes if eyes else left_eyes
         await msg.edit('\n'.join(img))

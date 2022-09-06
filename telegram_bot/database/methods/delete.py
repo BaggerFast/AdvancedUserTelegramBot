@@ -8,4 +8,3 @@ def delete_session(telegram_id: int):
     if user and user.session:
         session.delete(user.session)
         session.commit()
-

@@ -1,7 +1,5 @@
-from pprint import pprint
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message
-from loguru import logger
 from yookassa import Payment
 from uuid import uuid4
 from telegram_bot.database.methods.create import create_user_payment
@@ -34,7 +32,7 @@ async def __buy_vip(msg: Message) -> None:
                                reply_markup=keyboard)
     else:
         keyboard = get_payment_keyboard()
-        await bot.send_message(user_id, f'<b>VIP</b> доступ уже оплачен. Проверьте оплату', reply_markup=keyboard)
+        await bot.send_message(user_id, '<b>VIP</b> доступ уже оплачен. Проверьте оплату', reply_markup=keyboard)
 
 
 async def __check_buy(msg: Message) -> None:

@@ -109,4 +109,3 @@ def register_admin_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__do_advertising, content_types=['text'], state=AdminStates.INSERT_ADVERT_TEXT)
 
     dp.register_callback_query_handler(__analytic, lambda c: c.data == "analytics", state=AdminStates.ADMIN)
-

@@ -1,5 +1,5 @@
 from asyncio import sleep
-from random import choice, randint
+from random import choice
 
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
@@ -78,7 +78,7 @@ async def __compli(app: Client, msg: Message):
         'ласковая', 'романтичная', 'великолепная', 'внимательная', 'страстная', 'игривая', 'единственная',
         'стройная', 'безумная', 'симпатичная', 'изящная', 'талантливая', 'элегантная', 'чуткая', 'уникальная',
     )
-    await msg.edit(f'<b>Крошечные напоминания того, что ты...</b>')
+    await msg.edit('<b>Крошечные напоминания того, что ты...</b>')
     await sleep(1)
 
     for word in words:

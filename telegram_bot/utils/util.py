@@ -1,7 +1,6 @@
 from copy import deepcopy
 from aiogram.types import KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 from telegram_bot.database.methods.get import get_user_by_telegram_id
-from telegram_bot.database.models import User
 from telegram_bot.keyboards import KB_STOP_BOT, KB_START_BOT
 from telegram_bot.utils import TgConfig
 from telegram_bot.utils.process import check_process
