@@ -72,8 +72,6 @@ async def __do_advertising(query: Message, state: FSMContext):
 
 # endregion
 
-# region Analytics
-
 async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
     bot: Bot = query.bot
     user_id = query.from_user.id
@@ -95,17 +93,23 @@ async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
     await bot.send_message(user_id, '\n'.join(text))
 
 
-# endregion
-
-
 def register_admin_handlers(dp: Dispatcher) -> None:
-    _get_auth_handlers(dp)
-    _get_vip_handlers(dp)
 
-    dp.register_callback_query_handler(__add_admin, lambda c: c.data == "add_admin", state=AdminStates.ADMIN)
+    # region Msg handlers
+
     dp.register_message_handler(__admin_insert_tg_id, content_types=['text'], state=AdminStates.INSERT_NEW_ADMIN)
 
-    dp.register_callback_query_handler(__advertising, lambda c: c.data == "advertising", state=AdminStates.ADMIN)
     dp.register_message_handler(__do_advertising, content_types=['text'], state=AdminStates.INSERT_ADVERT_TEXT)
 
+    # endregion
+
+    # region Callback handlers
+
     dp.register_callback_query_handler(__analytic, lambda c: c.data == "analytics", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__add_admin, lambda c: c.data == "add_admin", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__advertising, lambda c: c.data == "advertising", state=AdminStates.ADMIN)
+
+    # endregion
+
+    _get_auth_handlers(dp)
+    _get_vip_handlers(dp)

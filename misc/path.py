@@ -1,8 +1,9 @@
 import os
+from abc import ABC
 from typing import Final
 
 
-class PathManager:
+class PathManager(ABC):
     ROOT: Final = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     @classmethod

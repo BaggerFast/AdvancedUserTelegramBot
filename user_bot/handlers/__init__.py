@@ -1,2 +1,1 @@
-from .common import get_common_handlers
-from .vip import get_vip_handlers
+from .main import register_all_handlers

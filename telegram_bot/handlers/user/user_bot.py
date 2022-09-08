@@ -15,38 +15,13 @@ from telegram_bot.database.methods.get import get_user_by_telegram_id
 from telegram_bot.utils import Env, CreateUserBotState
 from telegram_bot.utils.util import get_main_keyboard
 from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP
+from .util import _user_agreement_text
 from ...utils.process import start_process_if_sessions_exists, check_process, kill_process
 
 __sessions: dict[int, Client] = {}
 
 
 # region with State
-
-async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
-    bot: Bot = msg.bot
-    user_id = msg.from_user.id
-
-    user = get_user_by_telegram_id(user_id)
-
-    if check_process(user_id):
-        keyboard = get_main_keyboard(user_id)
-        await bot.send_message(user_id, "Ваш бот уже запущен!", reply_markup=keyboard)
-        return
-    if user and user.session:
-        start_process_if_sessions_exists(user_id)
-        keyboard = get_main_keyboard(user_id)
-        await state.finish()
-        await bot.send_message(
-            user_id,
-            "Бот запущен! ✅\n",
-            reply_markup=keyboard
-        )
-        return
-
-    await bot.send_document(user_id, open(PathManager.get('UserAgreement.pdf'), 'rb'), reply_markup=KB_CONTACT)
-    await bot.send_message(user_id, "Отправляя контакт, вы соглашаетесь с пользовательским соглашением!️",
-                           reply_markup=KB_CANCEL_SETUP)
-    await state.set_state(CreateUserBotState.PHONE)
 
 
 async def __input_phone(msg: Message, state: FSMContext) -> None:
@@ -158,6 +133,32 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     await state.finish()
 
 
+async def __start_input_user_settings(msg: Message, state: FSMContext) -> None:
+    bot: Bot = msg.bot
+    user_id = msg.from_user.id
+
+    user = get_user_by_telegram_id(user_id)
+
+    if check_process(user_id):
+        keyboard = get_main_keyboard(user_id)
+        await bot.send_message(user_id, "Ваш бот уже запущен!", reply_markup=keyboard)
+        return
+    if user and user.session:
+        start_process_if_sessions_exists(user_id)
+        keyboard = get_main_keyboard(user_id)
+        await state.finish()
+        await bot.send_message(
+            user_id,
+            "Бот запущен! ✅\n",
+            reply_markup=keyboard
+        )
+        return
+    await bot.send_document(user_id, open(PathManager.get('UserAgreement.pdf'), 'rb'), reply_markup=KB_CONTACT)
+    await bot.send_message(user_id, _user_agreement_text(msg.from_user.first_name), reply_markup=KB_CANCEL_SETUP)
+
+    await state.set_state(CreateUserBotState.PHONE)
+
+
 async def __stop_register_user_bot(query: CallbackQuery, state: FSMContext) -> None:
     bot: Bot = query.bot
     user_id = query.from_user.id
@@ -188,7 +189,8 @@ async def __delete_session(msg: Message) -> None:
 
 
 def _register_user_bot_handlers(dp: Dispatcher) -> None:
-    dp.register_callback_query_handler(__stop_register_user_bot, lambda c: c.data == "cancel_setup", state="*")
+
+    # region Msg handlers
 
     dp.register_message_handler(__input_phone, content_types=[types.ContentType.CONTACT],
                                 state=CreateUserBotState.PHONE)
@@ -198,3 +200,11 @@ def _register_user_bot_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__start_input_user_settings, content_types=['text'], text="Запустить бота ✅")
     dp.register_message_handler(__stop_bot, content_types=['text'], text="Остановить бота ❌")
     dp.register_message_handler(__delete_session, content_types=['text'], text="Удалить свои данные ⚠️")
+
+    # endregion
+
+    # region Callback handlers
+
+    dp.register_callback_query_handler(__stop_register_user_bot, lambda c: c.data == "cancel_setup", state="*")
+
+    # endregion

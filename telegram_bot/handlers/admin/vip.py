@@ -1,8 +1,7 @@
-import loguru
+from loguru import logger
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
-
 from telegram_bot.database.methods.other import switch_vip
 from telegram_bot.database.methods.update import set_vip
 from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists, check_process
@@ -38,14 +37,25 @@ async def __vip_insert_tg_id(msg: Message, state: FSMContext):
         await bot.send_message(other_user_id, "Администратор выдал вам vip доступ. ✨",
                                reply_markup=get_main_keyboard(other_user_id))
         await bot.send_message(user_id, "Успешно: выдан VIP доступ ✅")
-        loguru.logger.info(f'{other_user_id} got VIP access from {user_id}')
-    except Exception:
+        logger.info(f'{other_user_id} got VIP access from {user_id}')
+    except Exception as e:
+        logger.critical(e)
         await bot.send_message(user_id, "Произошел сбой ⚠️")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
     await state.set_state(AdminStates.ADMIN)
 
 
 def _get_vip_handlers(dp: Dispatcher) -> None:
+
+    # region Msg handlers
+
+    dp.register_message_handler(__vip_insert_tg_id, content_types=['text'], state=AdminStates.SET_VIP)
+
+    # endregion
+
+    # region Callback handlers
+
     dp.register_callback_query_handler(__vip_switcher, lambda c: c.data == "vip_switcher", state=AdminStates.ADMIN)
     dp.register_callback_query_handler(__set_vip, lambda c: c.data == "give_vip", state=AdminStates.ADMIN)
-    dp.register_message_handler(__vip_insert_tg_id, content_types=['text'], state=AdminStates.SET_VIP)
+
+    # endregion

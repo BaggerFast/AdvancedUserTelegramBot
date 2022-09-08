@@ -46,6 +46,9 @@ async def __cancel(msg: Message, state: FSMContext):
 
 
 def _get_auth_handlers(dp: Dispatcher) -> None:
+
+    # region Msg handlers
+
     dp.register_message_handler(__cancel, commands=['cancel'], state=[
         AdminStates.INSERT_NEW_ADMIN,
         AdminStates.INSERT_ADVERT_TEXT,
@@ -53,5 +56,11 @@ def _get_auth_handlers(dp: Dispatcher) -> None:
     ])
     dp.register_message_handler(__admin_auth, commands=['admin'], state=None)
     dp.register_message_handler(__admin, content_types=['text'], text='Admin 🤡', state=None)
+
+    # endregion
+
+    # region Callback handlers
+
     dp.register_callback_query_handler(__admin_exit, lambda c: c.data == "admin_exit", state=AdminStates.ADMIN)
 
+    # endregion

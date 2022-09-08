@@ -2,7 +2,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import Message
 
 
-async def other_messages(msg: Message):
+async def other_messages(msg: Message) -> None:
     bot: Bot = msg.bot
     await bot.send_message(msg.from_user.id, "Я вас не понял, напишите /start!")
 

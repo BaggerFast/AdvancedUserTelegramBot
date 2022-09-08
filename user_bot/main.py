@@ -1,15 +1,6 @@
 import sys
 from pyrogram import Client
-from user_bot.handlers import get_common_handlers, get_vip_handlers
-
-
-def __register_all_handlers(client: Client) -> None:
-    handlers = (
-        *get_common_handlers(),
-        *get_vip_handlers(),
-    )
-    for handler in handlers:
-        client.add_handler(handler)
+from user_bot.handlers import register_all_handlers
 
 
 def start_user_bot() -> None:
@@ -20,5 +11,5 @@ def start_user_bot() -> None:
         session_string=string_session,
         in_memory=True,
     )
-    __register_all_handlers(client)
+    register_all_handlers(client)
     client.run()

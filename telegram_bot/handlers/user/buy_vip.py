@@ -1,10 +1,11 @@
 from aiogram import Dispatcher, Bot
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from yookassa import Payment
 from uuid import uuid4
 from telegram_bot.database.methods.create import create_user_payment
 from telegram_bot.database.methods.get import get_user_by_telegram_id
 from telegram_bot.database.methods.update import set_vip
+from telegram_bot.handlers.user.util import _buy_vip_text
 from telegram_bot.utils import TgConfig
 from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
 from telegram_bot.utils.util import get_main_keyboard, get_payment_keyboard, get_payment_info
@@ -28,16 +29,15 @@ async def __buy_vip(msg: Message) -> None:
         create_user_payment(user, payment.id)
     if payment.status != 'succeeded':
         keyboard = get_payment_keyboard(payment.confirmation.confirmation_url)
-        await bot.send_message(user_id, f'Вы приобретаете <b>VIP</b> доступ.\nК оплате <b>{TgConfig.PRICE}</b> рублей',
-                               reply_markup=keyboard)
+        await bot.send_message(user_id, _buy_vip_text(), reply_markup=keyboard)
     else:
         keyboard = get_payment_keyboard()
         await bot.send_message(user_id, '<b>VIP</b> доступ уже оплачен. Проверьте оплату', reply_markup=keyboard)
 
 
-async def __check_buy(msg: Message) -> None:
-    bot: Bot = msg.bot
-    user_id = msg.from_user.id
+async def __check_buy(query: CallbackQuery) -> None:
+    bot: Bot = query.bot
+    user_id = query.from_user.id
     user = get_user_by_telegram_id(user_id)
     payment = Payment.find_one(user.payment.key)
     if payment.status == 'succeeded':
@@ -46,9 +46,19 @@ async def __check_buy(msg: Message) -> None:
         start_process_if_sessions_exists(user_id)
         await bot.send_message(user_id, "Вы успешно оформили вип доступ!🥳\n", reply_markup=get_main_keyboard(user_id))
     else:
-        await bot.send_message(user_id, "Оплата еще не проведена!\n")
+        await query.answer("Оплата еще не проведена!\n")
 
 
 def _register_vip_handlers(dp: Dispatcher) -> None:
+
+    # region Msg handlers
+
     dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию 💸")
+
+    # endregion
+
+    # region Callback handlers
+
     dp.register_callback_query_handler(__check_buy, lambda c: c.data == "check_payment")
+
+    # endregion
