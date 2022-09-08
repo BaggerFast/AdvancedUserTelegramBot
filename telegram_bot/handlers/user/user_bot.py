@@ -1,11 +1,14 @@
-from contextlib import suppress
 from datetime import timedelta
+from contextlib import suppress
+
+from loguru import logger
+
+from pyrogram import Client
+from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, PasswordHashInvalid
+
 from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
-from loguru import logger
-from pyrogram import Client
-from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, PasswordHashInvalid
 
 from misc.path import PathManager
 from telegram_bot.database.methods.create import create_session
@@ -13,10 +16,9 @@ from telegram_bot.database.methods.delete import delete_session
 from telegram_bot.database.methods.get import get_user_by_telegram_id
 
 from telegram_bot.utils import Env, CreateUserBotState
-from telegram_bot.utils.util import get_main_keyboard
-from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP
-from .util import _user_agreement_text
-from ...utils.process import start_process_if_sessions_exists, check_process, kill_process
+from telegram_bot.handlers.user.util import _user_agreement_text
+from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP, get_main_keyboard
+from telegram_bot.utils.process import start_process_if_sessions_exists, check_process, kill_process
 
 __sessions: dict[int, Client] = {}
 

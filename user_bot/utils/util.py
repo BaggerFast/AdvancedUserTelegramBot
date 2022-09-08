@@ -5,7 +5,6 @@ from contextlib import suppress
 
 from pyrogram import filters, Client
 from pyrogram.types import Message
-
 from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid
 
 from telegram_bot.utils import TgConfig
@@ -16,7 +15,7 @@ def get_me_filters(command: str) -> bool:
     return filters.me & filters.command(command, TgConfig.PREFIX)
 
 
-def cmd(auto_del: bool = True, time: float = 3) -> None:
+def cmd(auto_del: bool = True, time: float = 3):
     def input_func(handler):
         @functools.wraps(handler)
         async def wrapper(app: Client, msg: Message):

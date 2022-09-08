@@ -1,18 +1,21 @@
 from contextlib import suppress
 
 import loguru
-from aiogram import Dispatcher, Bot
-from aiogram.types import Message, CallbackQuery
-from aiogram.dispatcher import FSMContext
 
-from telegram_bot.database.methods.get import get_all_telegram_id, \
-    get_sessions_enable_count, get_user_count, get_sessions_count
+from aiogram import Dispatcher, Bot
+from aiogram.dispatcher import FSMContext
+from aiogram.types import Message, CallbackQuery
+
 from telegram_bot.database.methods.update import set_admin, set_vip
-from telegram_bot.handlers.admin.auth import _get_auth_handlers
+from telegram_bot.database.methods.get import get_all_telegram_id, get_sessions_enable_count, get_user_count, \
+    get_sessions_count
+
 from telegram_bot.handlers.admin.vip import _get_vip_handlers
-from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
+from telegram_bot.handlers.admin.auth import _get_auth_handlers
+
 from telegram_bot.utils.states import AdminStates
-from telegram_bot.utils.util import get_main_keyboard, get_admin_keyboard
+from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
+from telegram_bot.keyboards import get_main_keyboard, get_admin_keyboard
 
 
 # region Add admin
@@ -94,7 +97,6 @@ async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
 
 
 def register_admin_handlers(dp: Dispatcher) -> None:
-
     # region Msg handlers
 
     dp.register_message_handler(__admin_insert_tg_id, content_types=['text'], state=AdminStates.INSERT_NEW_ADMIN)

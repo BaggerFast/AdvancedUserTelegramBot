@@ -1,5 +1,4 @@
 import sqlalchemy.exc
-from sqlalchemy import select
 
 from telegram_bot.database.main import Database
 from telegram_bot.database.models import User, Session, Payment

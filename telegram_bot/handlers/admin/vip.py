@@ -1,12 +1,15 @@
 from loguru import logger
+
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
-from telegram_bot.database.methods.other import switch_vip
+
 from telegram_bot.database.methods.update import set_vip
-from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists, check_process
+from telegram_bot.database.methods.other import switch_vip
+
 from telegram_bot.utils.states import AdminStates
-from telegram_bot.utils.util import get_main_keyboard, get_admin_keyboard
+from telegram_bot.keyboards import get_main_keyboard, get_admin_keyboard
+from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists, check_process
 
 
 async def __vip_switcher(query: CallbackQuery, state: FSMContext):
@@ -27,7 +30,7 @@ async def __vip_insert_tg_id(msg: Message, state: FSMContext):
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     other_user_id = int(msg.text)
-    # todo remove Exception
+    # todo remove Exception`
     try:
         set_vip(other_user_id)
         if check_process(user_id):

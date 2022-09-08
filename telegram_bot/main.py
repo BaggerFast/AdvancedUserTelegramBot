@@ -1,16 +1,22 @@
 from contextlib import suppress
 
+from loguru import logger
+
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.exceptions import ChatNotFound, BotBlocked
-from loguru import logger
 
-from telegram_bot.database.methods.get import get_users_with_sessions
-from telegram_bot.handlers import register_all_handlers
-from telegram_bot.utils.env import Env
 from telegram_bot.database import register_models
+from telegram_bot.database.methods.get import get_users_with_sessions
+
+from telegram_bot.utils import Env
+from telegram_bot.keyboards import get_main_keyboard
+from telegram_bot.handlers import register_all_handlers
 from telegram_bot.utils.process import start_process_if_sessions_exists
-from telegram_bot.utils.util import get_main_keyboard
+
+
+
+
 
 
 async def __on_start_up(dp: Dispatcher) -> None:

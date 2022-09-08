@@ -1,9 +1,7 @@
-from sqlalchemy import select
-
+from telegram_bot.database.models import User
 from telegram_bot.database.main import Database
 from telegram_bot.database.methods.create import create_user
 from telegram_bot.database.methods.get import get_user_by_telegram_id
-from telegram_bot.database.models import User
 
 
 def is_vip(telegram_id) -> bool:

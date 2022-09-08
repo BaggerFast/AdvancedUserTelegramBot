@@ -2,10 +2,10 @@ from asyncio import sleep
 from pyrogram.types import Message
 from pyrogram.handlers import MessageHandler
 
-from user_bot.handlers.vip.games import _get_game_vip_handlers
-from user_bot.handlers.vip.stickers import _get_sticker_vip_handlers
-from user_bot.handlers.vip.texts import _get_text_vip_handlers
 from user_bot.utils import get_me_filters, UserConfig, cmd
+from user_bot.handlers.vip.games import _get_game_vip_handlers
+from user_bot.handlers.vip.texts import _get_text_vip_handlers
+from user_bot.handlers.vip.stickers import _get_sticker_vip_handlers
 
 
 @cmd(False)

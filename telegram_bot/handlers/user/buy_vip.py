@@ -1,14 +1,17 @@
+from uuid import uuid4
+
+from yookassa import Payment
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
-from yookassa import Payment
-from uuid import uuid4
+
+from telegram_bot.database.methods.update import set_vip
 from telegram_bot.database.methods.create import create_user_payment
 from telegram_bot.database.methods.get import get_user_by_telegram_id
-from telegram_bot.database.methods.update import set_vip
+
+from telegram_bot.utils.util import get_payment_info
 from telegram_bot.handlers.user.util import _buy_vip_text
-from telegram_bot.utils import TgConfig
 from telegram_bot.utils.process import kill_process, start_process_if_sessions_exists
-from telegram_bot.utils.util import get_main_keyboard, get_payment_keyboard, get_payment_info
+from telegram_bot.keyboards import get_main_keyboard, get_payment_keyboard
 
 
 async def __buy_vip(msg: Message) -> None:

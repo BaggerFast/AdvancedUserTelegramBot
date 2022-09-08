@@ -44,9 +44,9 @@ async def __tik_tac_toe(app: Client, msg: Message):
 
 @cmd(False)
 async def __kill(app, msg: Message):
-    await msg.edit("<b>🔪 На тебя заказали убийство.</b>")  # red
+    await msg.edit("<b>🔪 На тебя заказали убийство.</b>")
     await sleep(3)
-    await msg.edit(f"<b>👀 У тебя есть пару секунд чтобы спрятаться.</b>")  # orange
+    await msg.edit(f"<b>👀 У тебя есть пару секунд чтобы спрятаться.</b>")
     await sleep(2)
 
     for i in range(5, 0, -1):
