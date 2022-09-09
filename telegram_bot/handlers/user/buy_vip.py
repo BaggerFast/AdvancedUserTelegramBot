@@ -5,7 +5,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
 
 from telegram_bot.database.methods.update import set_vip
-from telegram_bot.database.methods.create import create_user_payment
+from telegram_bot.database.methods.create import create_user_payment, create_user
 from telegram_bot.database.methods.get import get_user_by_telegram_id
 
 from telegram_bot.utils.util import get_payment_info
@@ -42,6 +42,7 @@ async def __check_buy(query: CallbackQuery) -> None:
     bot: Bot = query.bot
     user_id = query.from_user.id
     user = get_user_by_telegram_id(user_id)
+
     payment = Payment.find_one(user.payment.key)
     if payment.status == 'succeeded':
         set_vip(user_id)
@@ -49,7 +50,7 @@ async def __check_buy(query: CallbackQuery) -> None:
         start_process_if_sessions_exists(user_id)
         await bot.send_message(user_id, "Вы успешно оформили вип доступ!🥳\n", reply_markup=get_main_keyboard(user_id))
     else:
-        await query.answer("Оплата еще не проведена!\n")
+        await query.answer("Оплата еще не проведена!\n", cache_time=0)
 
 
 def _register_vip_handlers(dp: Dispatcher) -> None:
@@ -62,6 +63,6 @@ def _register_vip_handlers(dp: Dispatcher) -> None:
 
     # region Callback handlers
 
-    dp.register_callback_query_handler(__check_buy, lambda c: c.data == "check_payment")
+    dp.register_callback_query_handler(__check_buy, text_contains="check_payment")
 
     # endregion
