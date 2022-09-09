@@ -4,9 +4,11 @@ from yookassa import Payment
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
 
+from misc.html_tags import b
 from telegram_bot.database.methods.update import set_vip
 from telegram_bot.database.methods.create import create_user_payment
 from telegram_bot.database.methods.get import get_user_by_telegram_id
+from telegram_bot.filters.main import NotAdmin, NotVip
 
 from telegram_bot.utils.util import get_payment_info
 from telegram_bot.handlers.user.util import _buy_vip_text
@@ -19,23 +21,17 @@ async def __buy_vip(msg: Message) -> None:
     user_id = msg.from_user.id
     user = get_user_by_telegram_id(user_id)
 
-    if user.vip:
-        await bot.send_message(user_id, 'Вы уже приобрели vip доступ')
-        return
-    if user.admin:
-        await bot.send_message(user_id, 'Вы являетесь администратором, используйте настройку в Админ меню')
-        return
-
-    pay_id = user.payment.key if user.payment else f'{uuid4()}'
-    payment = Payment.create(get_payment_info(), pay_id)
     if user and not user.payment:
+        payment = Payment.create(get_payment_info(), uuid4())
         create_user_payment(user, payment.id)
+    else:
+        payment = Payment.find_one(user.payment.key)
     if payment.status != 'succeeded':
         keyboard = get_payment_keyboard(payment.confirmation.confirmation_url)
         await bot.send_message(user_id, _buy_vip_text(), reply_markup=keyboard)
     else:
         keyboard = get_payment_keyboard()
-        await bot.send_message(user_id, '<b>VIP</b> доступ уже оплачен. Проверьте оплату', reply_markup=keyboard)
+        await bot.send_message(user_id, f"{b('VIP')} доступ уже оплачен. Проверьте оплату", reply_markup=keyboard)
 
 
 async def __check_buy(query: CallbackQuery) -> None:
@@ -57,7 +53,7 @@ def _register_vip_handlers(dp: Dispatcher) -> None:
 
     # region Msg handlers
 
-    dp.register_message_handler(__buy_vip, content_types=['text'], text="Купить полную версию 💸")
+    dp.register_message_handler(__buy_vip, NotAdmin(), NotVip(), content_types=['text'], text="Купить полную версию 💸")
 
     # endregion
 
