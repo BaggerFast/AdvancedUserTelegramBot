@@ -46,7 +46,6 @@ async def __admin_insert_tg_id(msg: Message, state: FSMContext):
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
     await state.set_state(AdminStates.ADMIN)
 
-
 # endregion
 
 # region Advert
@@ -73,12 +72,10 @@ async def __do_advertising(query: Message, state: FSMContext):
     await bot.send_message(user_id, f"Рассылка выполнена - у {count} пользователей ✅")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
 
-
 # endregion
 
+
 async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
-    bot: Bot = query.bot
-    user_id = query.from_user.id
 
     users_count = get_user_count()
     user_session_count = get_sessions_count()
@@ -87,17 +84,18 @@ async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
     session_enable_count = vip_session_enable_count + free_session_enable_count
 
     text = (
-        '<b>Отчет:</b>\n',
+        'Отчет:\n',
         f'Кол-во пользователей: {users_count}',
         f'Кол-во сессий: {user_session_count}\n',
         f'VIP онлайн: {vip_session_enable_count}',
         f'Free онлайн: {free_session_enable_count}',
         f'Total онлайн: {session_enable_count}',
     )
-    await bot.send_message(user_id, '\n'.join(text))
+    await query.answer('\n'.join(text), show_alert=True, cache_time=0)
 
 
 def register_admin_handlers(dp: Dispatcher) -> None:
+
     # region Msg handlers
 
     dp.register_message_handler(__admin_insert_tg_id, IsAdmin(), content_types=['text'],
@@ -110,8 +108,10 @@ def register_admin_handlers(dp: Dispatcher) -> None:
 
     # region Callback handlers
 
-    dp.register_callback_query_handler(__analytic, IsAdmin(), lambda c: c.data == "analytics", state=AdminStates.ADMIN)
-    dp.register_callback_query_handler(__add_admin, IsAdmin(), lambda c: c.data == "add_admin", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__analytic, IsAdmin(), lambda c: c.data == "analytics",
+                                       state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__add_admin, IsAdmin(), lambda c: c.data == "add_admin",
+                                       state=AdminStates.ADMIN)
     dp.register_callback_query_handler(__advertising, IsAdmin(), lambda c: c.data == "advertising",
                                        state=AdminStates.ADMIN)
 

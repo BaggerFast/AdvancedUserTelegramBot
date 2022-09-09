@@ -2,6 +2,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
 
 from misc import get_vip_commands_help, get_commands_help
+from misc.html_tags import b, i
 from telegram_bot.handlers.user.buy_vip import _register_vip_handlers
 from telegram_bot.handlers.user.user_bot import _register_user_bot_handlers
 
@@ -41,9 +42,9 @@ async def __vip_commands(query: CallbackQuery) -> None:
 async def __free_commands(query: CallbackQuery) -> None:
     bot: Bot = query.bot
     commands = sorted(get_commands_help())
-    message = "Все <b>FREE</b> команды:\n\n"
+    message = f"Все {b('FREE')} команды:\n\n"
     for cmd in commands:
-        message += f'{TgConfig.PREFIX}<b><i>{cmd.lower()}</i></b>\n'
+        message += f'{TgConfig.PREFIX}{b(i(cmd))}\n'
     await bot.send_message(query.from_user.id, message)
 
 
