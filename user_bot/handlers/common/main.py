@@ -5,6 +5,7 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
+from misc.html_tags import b
 from user_bot.filters import get_free_filters
 from user_bot.handlers.common.games import _get_game_handlers
 from user_bot.utils import cmd, play_anim
@@ -12,7 +13,7 @@ from user_bot.handlers.common.stickers import _get_sticker_handlers
 from user_bot.handlers.common.texts import _get_text_handlers
 
 
-@cmd(False)
+@cmd()
 async def __night(app, msg: Message):
     sleep_words = (
         'зайка 💚', 'солнышко 💛', 'котёнок ❤', 'цветочек 💙', 'ангелочек 💜', 'принцесса 💓',
@@ -22,14 +23,14 @@ async def __night(app, msg: Message):
         '❤ я ❤', '💚 тебя 💚', '💙 очень 💙', '💛 сильно 💛', '💜 люблю 💜',
     )
     for word in sleep_words:
-        await msg.edit(f'<b>Cпокойной ночи {word}</b>')
+        await msg.edit(b(f'Cпокойной ночи {word}'))
         await sleep(0.5)
     for word in love_words:
-        await msg.edit(f'<b>{word}</b>')
+        await msg.edit(b(word))
         await sleep(0.5)
 
 
-@cmd()
+@cmd(True)
 async def __bombs(app: Client, msg: Message):
     row = '▪️▪️▪️▪️\n'
     bombs = '💣 💣 💣 💣\n'
@@ -49,7 +50,7 @@ async def __bombs(app: Client, msg: Message):
     await play_anim(msg, words)
 
 
-@cmd()
+@cmd(True)
 async def __stupid(app: Client, msg: Message):
     first_str = 'YOUR BRAIN ➡️ 🧠\n\n🧠'
     second_str = 'YOUR BRAIN ➡️ 🧠\n\n'
@@ -70,7 +71,7 @@ async def __stupid(app: Client, msg: Message):
     await play_anim(msg, words)
 
 
-@cmd(False)
+@cmd()
 async def __compli(app: Client, msg: Message):
     words = (
         'удивительная', 'внимательная', 'красивая', 'лучшая', 'успешная', 'заботливая', 'милая', 'прекрасная',
@@ -83,9 +84,9 @@ async def __compli(app: Client, msg: Message):
     await sleep(1)
 
     for word in words:
-        await msg.edit(f'<b>Cамая {word}</b> ✨')
+        await msg.edit(b(f'Cамая {word}✨'))
         await sleep(0.5)
-    await msg.edit(f'<b>Cамая {choice(words)}</b> ✨')
+    await msg.edit(b(f'Cамая {choice(words)}✨'))
 
 
 def get_common_handlers() -> tuple[MessageHandler, ...]:
@@ -98,6 +99,4 @@ def get_common_handlers() -> tuple[MessageHandler, ...]:
         *_get_game_handlers(),
         *_get_text_handlers(),
         *_get_sticker_handlers(),
-
-
     )

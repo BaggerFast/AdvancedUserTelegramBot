@@ -9,7 +9,7 @@ from user_bot.handlers.vip.util import _get_heart_stickers
 from user_bot.utils import play_stroke_anim, cmd
 
 
-@cmd(False)
+@cmd()
 async def __like(app: Client, msg: Message):
     img = (
         "🟦🟦🟦🟦🟦🟦🟦🟦",
@@ -22,7 +22,7 @@ async def __like(app: Client, msg: Message):
     await play_stroke_anim(msg, img)
 
 
-@cmd(False)
+@cmd()
 async def __dislike(app: Client, msg: Message):
     img = (
         "🟥🟥🟥🟥🟥🟥🟥🟥",
@@ -35,9 +35,8 @@ async def __dislike(app: Client, msg: Message):
     await play_stroke_anim(msg, img)
 
 
-@cmd(True)
+@cmd()
 async def __heart(app: Client, msg: Message):
-    # todo: heart
     img = _get_heart_stickers()
     for anim in img:
         await msg.edit('\n'.join(anim))

@@ -31,7 +31,7 @@ def get_admin_keyboard(user_id: int) -> InlineKeyboardMarkup:
     kb.add(
         InlineKeyboardButton("Добавить администратора ➕", callback_data="add_admin"),
         InlineKeyboardButton(f"Vip {'ВЫКЛ ❌' if user.vip else 'ВКЛ ✅'}", callback_data="vip_switcher"),
-        InlineKeyboardButton(f"Выдать Vip ✨", callback_data="give_vip"),
+        InlineKeyboardButton("Выдать Vip ✨", callback_data="give_vip"),
         InlineKeyboardButton("Аналитика 🤌", callback_data="analytics"),
         InlineKeyboardButton("Рассылка ✉️", callback_data="advertising"),
         InlineKeyboardButton("Выйти ⛔️", callback_data="admin_exit"),

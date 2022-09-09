@@ -100,9 +100,11 @@ async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
 def register_admin_handlers(dp: Dispatcher) -> None:
     # region Msg handlers
 
-    dp.register_message_handler(__admin_insert_tg_id, IsAdmin(), content_types=['text'], state=AdminStates.INSERT_NEW_ADMIN)
+    dp.register_message_handler(__admin_insert_tg_id, IsAdmin(), content_types=['text'],
+                                state=AdminStates.INSERT_NEW_ADMIN)
 
-    dp.register_message_handler(__do_advertising, IsAdmin(), content_types=['text'], state=AdminStates.INSERT_ADVERT_TEXT)
+    dp.register_message_handler(__do_advertising, IsAdmin(), content_types=['text'],
+                                state=AdminStates.INSERT_ADVERT_TEXT)
 
     # endregion
 
@@ -110,7 +112,8 @@ def register_admin_handlers(dp: Dispatcher) -> None:
 
     dp.register_callback_query_handler(__analytic, IsAdmin(), lambda c: c.data == "analytics", state=AdminStates.ADMIN)
     dp.register_callback_query_handler(__add_admin, IsAdmin(), lambda c: c.data == "add_admin", state=AdminStates.ADMIN)
-    dp.register_callback_query_handler(__advertising, IsAdmin(), lambda c: c.data == "advertising", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__advertising, IsAdmin(), lambda c: c.data == "advertising",
+                                       state=AdminStates.ADMIN)
 
     # endregion
 

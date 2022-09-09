@@ -6,7 +6,7 @@ from user_bot.filters import get_vip_filters
 from user_bot.utils import cmd, play_stroke_anim
 
 
-@cmd(False)
+@cmd()
 async def __ban(app: Client, msg: Message):
     text = (
         "████╗███╗█╗█╗",

@@ -9,7 +9,7 @@ from user_bot.filters import get_free_filters
 from user_bot.utils import cmd
 
 
-@cmd(False)
+@cmd()
 async def __coin(app: Client, msg: Message):
     loader = (
         f'{randint(1, 10)}%   █▒▒▒▒▒▒▒▒▒▒▒▒',

@@ -10,7 +10,7 @@ from user_bot.utils import cmd
 from user_bot.handlers.vip.util import _tic_tak_toe_status
 
 
-@cmd(False)
+@cmd()
 async def __tik_tac_toe(app: Client, msg: Message):
     field = [
         ["〰️", "〰️", "〰️"],
@@ -43,7 +43,7 @@ async def __tik_tac_toe(app: Client, msg: Message):
     await app.send_message(msg.chat.id, 'У вас: Ничья')
 
 
-@cmd(False)
+@cmd()
 async def __kill(app, msg: Message):
     await msg.edit("<b>🔪 На тебя заказали убийство.</b>")
     await sleep(3)

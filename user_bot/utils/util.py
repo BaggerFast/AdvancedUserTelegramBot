@@ -11,7 +11,7 @@ from telegram_bot.utils import TgConfig
 from user_bot.utils.config import UserConfig
 
 
-def cmd(auto_del: bool = True, time: float = 3):
+def cmd(auto_del: bool = False, time: float = 3):
     def input_func(handler):
         @functools.wraps(handler)
         async def wrapper(app: Client, msg: Message):

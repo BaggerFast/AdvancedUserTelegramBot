@@ -6,7 +6,7 @@ from user_bot.filters import get_free_filters
 from user_bot.utils import cmd, play_stroke_anim
 
 
-@cmd(False)
+@cmd()
 async def __hello(app: Client, msg: Message):
     text = (
         "╔┓┏╦━━╦┓╔┓╔━━╗",
@@ -17,7 +17,7 @@ async def __hello(app: Client, msg: Message):
     await play_stroke_anim(msg, text)
 
 
-@cmd(False)
+@cmd()
 async def __bruh(app: Client, msg: Message):
     text = (
         "╭━━╮╱╱╱╱╱╭╮",
@@ -30,7 +30,7 @@ async def __bruh(app: Client, msg: Message):
     await play_stroke_anim(msg, text)
 
 
-@cmd(False)
+@cmd()
 async def __press_f(app: Client, msg: Message):
     text = (
         "████████",
@@ -44,7 +44,7 @@ async def __press_f(app: Client, msg: Message):
     await play_stroke_anim(msg, text)
 
 
-@cmd(False)
+@cmd()
 async def __lol(app: Client, msg: Message):
     text = (
         "┏━┓┈┈╭━━━━╮┏━┓┈┈",

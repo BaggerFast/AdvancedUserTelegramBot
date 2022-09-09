@@ -16,8 +16,7 @@ async def __start(msg: Message) -> None:
     user_id = msg.from_user.id
     keyboard = get_main_keyboard(user_id)
     await bot.send_message(user_id, f"Привет, <b>{msg.from_user.first_name}</b>!\n"
-                                    f"Это <b>лучший</b> юзер бот с анимациями!😎", reply_markup=keyboard,
-                           parse_mode="HTML")
+                                    f"Это <b>лучший</b> юзер бот с анимациями!😎", reply_markup=keyboard)
 
 
 async def __teh_support(msg: Message) -> None:

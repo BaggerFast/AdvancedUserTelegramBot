@@ -9,7 +9,7 @@ from user_bot.filters import get_free_filters
 from user_bot.utils import cmd, play_stroke_anim
 
 
-@cmd(False)
+@cmd()
 async def __steve(app: Client, msg: Message):
     img = (
         "🏿🏿🏿🏿🏿🏿🏿🏿",
@@ -23,7 +23,7 @@ async def __steve(app: Client, msg: Message):
     await play_stroke_anim(msg, img)
 
 
-@cmd(False)
+@cmd()
 async def __uno(app: Client, msg: Message):
     img = (
         "⣿⣿⣿⡿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇",
@@ -43,7 +43,7 @@ async def __uno(app: Client, msg: Message):
     await play_stroke_anim(msg, img)
 
 
-@cmd(False)
+@cmd()
 async def __gubka(app: Client, msg: Message):
     img = (
         "╲┏━┳━━━━━━━━┓╲╲",
@@ -57,7 +57,7 @@ async def __gubka(app: Client, msg: Message):
     await play_stroke_anim(msg, img)
 
 
-@cmd(False)
+@cmd()
 async def __rabbit(app: Client, msg: Message):
     left_eyes = '┈┃▋▏▋▏┃┈'
     right_eyes = '┈┃╱▋╱▋┃┈'
