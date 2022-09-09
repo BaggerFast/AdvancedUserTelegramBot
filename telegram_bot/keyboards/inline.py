@@ -1,6 +1,6 @@
 from typing import Final
-
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram_bot.utils import TgConfig
 
 KB_CANCEL_SETUP: Final = InlineKeyboardMarkup(1)
 KB_CANCEL_SETUP.add(
@@ -9,6 +9,6 @@ KB_CANCEL_SETUP.add(
 
 KB_INFO: Final = InlineKeyboardMarkup(1)
 KB_INFO.add(
-    InlineKeyboardButton("VIP", callback_data="vip_commands"),
-    InlineKeyboardButton("FREE", callback_data="free_commands")
+    InlineKeyboardButton("VIP", url=TgConfig.VIP_HELP_URL),
+    InlineKeyboardButton("FREE", url=TgConfig.FREE_HELP_URL)
 )

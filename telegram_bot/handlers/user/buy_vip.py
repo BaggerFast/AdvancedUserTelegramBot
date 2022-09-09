@@ -5,7 +5,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import Message, CallbackQuery
 
 from telegram_bot.database.methods.update import set_vip
-from telegram_bot.database.methods.create import create_user_payment, create_user
+from telegram_bot.database.methods.create import create_user_payment
 from telegram_bot.database.methods.get import get_user_by_telegram_id
 
 from telegram_bot.utils.util import get_payment_info

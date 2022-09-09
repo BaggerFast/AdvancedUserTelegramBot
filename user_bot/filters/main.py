@@ -2,7 +2,6 @@ from pyrogram import filters
 from pyrogram.types.messages_and_media.message import Message
 
 from user_bot.utils import UserConfig
-from telegram_bot.utils import TgConfig
 
 
 def is_vip_filter():
@@ -12,7 +11,7 @@ def is_vip_filter():
 
 
 def get_free_filters(command: str) -> bool:
-    return filters.me & filters.command(command, TgConfig.PREFIX)
+    return filters.me & filters.command(command, UserConfig.PREFIX)
 
 
 def get_vip_filters(command: str) -> bool:
