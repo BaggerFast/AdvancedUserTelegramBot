@@ -5,8 +5,9 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
+from user_bot.filters import get_free_filters
 from user_bot.handlers.common.games import _get_game_handlers
-from user_bot.utils import get_me_filters, cmd, play_anim
+from user_bot.utils import cmd, play_anim
 from user_bot.handlers.common.stickers import _get_sticker_handlers
 from user_bot.handlers.common.texts import _get_text_handlers
 
@@ -89,10 +90,10 @@ async def __compli(app: Client, msg: Message):
 
 def get_common_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__bombs, filters=get_me_filters('bombs')),
-        MessageHandler(__night, filters=get_me_filters('night')),
-        MessageHandler(__stupid, filters=get_me_filters('stupid')),
-        MessageHandler(__compli, filters=get_me_filters('compli')),
+        MessageHandler(__bombs, filters=get_free_filters('bombs')),
+        MessageHandler(__night, filters=get_free_filters('night')),
+        MessageHandler(__stupid, filters=get_free_filters('stupid')),
+        MessageHandler(__compli, filters=get_free_filters('compli')),
 
         *_get_game_handlers(),
         *_get_text_handlers(),

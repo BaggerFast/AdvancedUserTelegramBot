@@ -9,6 +9,7 @@ from aiogram.types import Message, CallbackQuery
 from telegram_bot.database.methods.update import set_admin, set_vip
 from telegram_bot.database.methods.get import get_all_telegram_id, get_sessions_enable_count, get_user_count, \
     get_sessions_count
+from telegram_bot.filters.main import IsAdmin
 
 from telegram_bot.handlers.admin.vip import _get_vip_handlers
 from telegram_bot.handlers.admin.auth import _get_auth_handlers
@@ -99,17 +100,17 @@ async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
 def register_admin_handlers(dp: Dispatcher) -> None:
     # region Msg handlers
 
-    dp.register_message_handler(__admin_insert_tg_id, content_types=['text'], state=AdminStates.INSERT_NEW_ADMIN)
+    dp.register_message_handler(__admin_insert_tg_id, IsAdmin(), content_types=['text'], state=AdminStates.INSERT_NEW_ADMIN)
 
-    dp.register_message_handler(__do_advertising, content_types=['text'], state=AdminStates.INSERT_ADVERT_TEXT)
+    dp.register_message_handler(__do_advertising, IsAdmin(), content_types=['text'], state=AdminStates.INSERT_ADVERT_TEXT)
 
     # endregion
 
     # region Callback handlers
 
-    dp.register_callback_query_handler(__analytic, lambda c: c.data == "analytics", state=AdminStates.ADMIN)
-    dp.register_callback_query_handler(__add_admin, lambda c: c.data == "add_admin", state=AdminStates.ADMIN)
-    dp.register_callback_query_handler(__advertising, lambda c: c.data == "advertising", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__analytic, IsAdmin(), lambda c: c.data == "analytics", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__add_admin, IsAdmin(), lambda c: c.data == "add_admin", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__advertising, IsAdmin(), lambda c: c.data == "advertising", state=AdminStates.ADMIN)
 
     # endregion
 

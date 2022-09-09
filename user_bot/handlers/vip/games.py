@@ -5,7 +5,8 @@ from pyrogram import Client
 from pyrogram.types import Message
 from pyrogram.handlers import MessageHandler
 
-from user_bot.utils import get_me_filters, cmd
+from user_bot.filters import get_vip_filters
+from user_bot.utils import cmd
 from user_bot.handlers.vip.util import _tic_tak_toe_status
 
 
@@ -67,6 +68,6 @@ async def __kill(app, msg: Message):
 
 def _get_game_vip_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__tik_tac_toe, filters=get_me_filters('tick')),
-        MessageHandler(__kill, filters=get_me_filters('kill')),
+        MessageHandler(__tik_tac_toe, filters=get_vip_filters('tick')),
+        MessageHandler(__kill, filters=get_vip_filters('kill')),
     )

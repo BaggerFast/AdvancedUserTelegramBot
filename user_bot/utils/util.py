@@ -3,16 +3,12 @@ import functools
 from asyncio import sleep
 from contextlib import suppress
 
-from pyrogram import filters, Client
+from pyrogram import Client
 from pyrogram.types import Message
 from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid
 
 from telegram_bot.utils import TgConfig
 from user_bot.utils.config import UserConfig
-
-
-def get_me_filters(command: str) -> bool:
-    return filters.me & filters.command(command, TgConfig.PREFIX)
 
 
 def cmd(auto_del: bool = True, time: float = 3):

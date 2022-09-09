@@ -4,7 +4,9 @@ from random import randint, choice
 from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
-from user_bot.utils import cmd, get_me_filters
+
+from user_bot.filters import get_free_filters
+from user_bot.utils import cmd
 
 
 @cmd(False)
@@ -30,5 +32,5 @@ async def __coin(app: Client, msg: Message):
 
 def _get_game_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__coin, filters=get_me_filters('coin')),
+        MessageHandler(__coin, filters=get_free_filters('coin')),
     )

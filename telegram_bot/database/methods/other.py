@@ -9,7 +9,6 @@ def is_vip(telegram_id) -> bool:
 
 
 def is_admin(telegram_id: int) -> bool:
-    create_user(telegram_id)
     return bool(Database().session.query(User.admin).filter(User.telegram_id == telegram_id).one()[0])
 
 

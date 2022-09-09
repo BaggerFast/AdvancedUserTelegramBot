@@ -4,8 +4,9 @@ from pyrogram import Client
 from pyrogram.types import Message
 from pyrogram.handlers import MessageHandler
 
+from user_bot.filters import get_vip_filters
 from user_bot.handlers.vip.util import _get_heart_stickers
-from user_bot.utils import get_me_filters, play_stroke_anim, cmd
+from user_bot.utils import play_stroke_anim, cmd
 
 
 @cmd(False)
@@ -45,7 +46,7 @@ async def __heart(app: Client, msg: Message):
 
 def _get_sticker_vip_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__like, filters=get_me_filters('like')),
-        MessageHandler(__dislike, filters=get_me_filters('dislike')),
-        MessageHandler(__heart, filters=get_me_filters('heart')),
+        MessageHandler(__like, filters=get_vip_filters('like')),
+        MessageHandler(__dislike, filters=get_vip_filters('dislike')),
+        MessageHandler(__heart, filters=get_vip_filters('heart')),
     )

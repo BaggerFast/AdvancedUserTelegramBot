@@ -5,7 +5,8 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
-from user_bot.utils import cmd, get_me_filters, play_stroke_anim
+from user_bot.filters import get_free_filters
+from user_bot.utils import cmd, play_stroke_anim
 
 
 @cmd(False)
@@ -84,8 +85,8 @@ async def __rabbit(app: Client, msg: Message):
 
 def _get_sticker_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__steve, filters=get_me_filters('steve')),
-        MessageHandler(__uno, filters=get_me_filters('uno')),
-        MessageHandler(__gubka, filters=get_me_filters('gubka')),
-        MessageHandler(__rabbit, filters=get_me_filters('rabbit'))
+        MessageHandler(__steve, filters=get_free_filters('steve')),
+        MessageHandler(__uno, filters=get_free_filters('uno')),
+        MessageHandler(__gubka, filters=get_free_filters('gubka')),
+        MessageHandler(__rabbit, filters=get_free_filters('rabbit'))
     )

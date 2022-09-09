@@ -6,6 +6,7 @@ from aiogram.types import Message, CallbackQuery
 
 from telegram_bot.database.methods.update import set_vip
 from telegram_bot.database.methods.other import switch_vip
+from telegram_bot.filters.main import IsAdmin
 
 from telegram_bot.utils.states import AdminStates
 from telegram_bot.keyboards import get_main_keyboard, get_admin_keyboard
@@ -52,13 +53,15 @@ def _get_vip_handlers(dp: Dispatcher) -> None:
 
     # region Msg handlers
 
-    dp.register_message_handler(__vip_insert_tg_id, content_types=['text'], state=AdminStates.SET_VIP)
+    dp.register_message_handler(__vip_insert_tg_id, IsAdmin(), content_types=['text'], state=AdminStates.SET_VIP)
 
     # endregion
 
     # region Callback handlers
 
-    dp.register_callback_query_handler(__vip_switcher, lambda c: c.data == "vip_switcher", state=AdminStates.ADMIN)
-    dp.register_callback_query_handler(__set_vip, lambda c: c.data == "give_vip", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__vip_switcher, IsAdmin(),
+                                       lambda c: c.data == "vip_switcher", state=AdminStates.ADMIN)
+    dp.register_callback_query_handler(__set_vip, IsAdmin(),
+                                       lambda c: c.data == "give_vip", state=AdminStates.ADMIN)
 
     # endregion
