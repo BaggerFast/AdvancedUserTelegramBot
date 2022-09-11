@@ -83,10 +83,37 @@ async def __rabbit(app: Client, msg: Message):
         await sleep(0.5)
 
 
+@cmd()
+async def __gg(app: Client, msg: Message):
+    img = (
+        '░░░░░░░░░░░░░░',
+        "░░█▀▀█░░█▀▀█░░",
+        "░░█░▄▄░░█░▄▄░░",
+        "░░█▄▄█░░█▄▄█░░",
+        "░░░░░░░░░░░░░░",
+    )
+    await play_stroke_anim(msg, img)
+
+
+@cmd()
+async def __bye(app: Client, msg: Message):
+    img = (
+        "╭━━┳╮╱╱╭┳━━━╮",
+        "┃╭╮┃╰╮╭╯┃╭━━╯",
+        "┃╰╯╰╮╰╯╭┫╰━━╮",
+        "┃╭━╮┣╮╭╯┃╭━━╯",
+        "┃╰━╯┃┃┃╱┃╰━━╮",
+        "╰━━━╯╰╯╱╰━━━╯",
+    )
+    await play_stroke_anim(msg, img)
+
+
 def _get_sticker_handlers() -> tuple[MessageHandler, ...]:
     return (
         MessageHandler(__steve, filters=get_free_filters('steve')),
         MessageHandler(__uno, filters=get_free_filters('uno')),
         MessageHandler(__gubka, filters=get_free_filters('gubka')),
-        MessageHandler(__rabbit, filters=get_free_filters('rabbit'))
+        MessageHandler(__rabbit, filters=get_free_filters('rabbit')),
+        MessageHandler(__gg, filters=get_free_filters('gg')),
+        MessageHandler(__bye, filters=get_free_filters('bye')),
     )
