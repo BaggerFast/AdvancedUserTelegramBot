@@ -1,5 +1,5 @@
 from aiogram import Dispatcher, Bot
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message
 
 from telegram_bot.handlers.user.buy_vip import _register_vip_handlers
 from telegram_bot.handlers.user.user_bot import _register_user_bot_handlers

@@ -23,7 +23,6 @@ def get_main_keyboard(user_id: int) -> ReplyKeyboardMarkup:
 
 
 def get_admin_keyboard(user_id: int) -> InlineKeyboardMarkup:
-    # todo: fix Exception
     user = get_user_by_telegram_id(user_id)
     if not user.admin:
         raise Exception()

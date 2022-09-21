@@ -1,18 +1,17 @@
 # Telegram
-Pyrogram~=2.0.41
-aiogram~=2.22.1
-
+Pyrogram
+aiogram
 
 # Database
-SQLAlchemy~=1.4.40
+SQLAlchemy
 
 # Debug
 pylint_runner
-loguru~=0.6.0
+loguru
 
 # Other
-asyncio~=3.4.3
+asyncio
 tgcrypto
 
-
-yookassa~=2.3.2
+#Payment
+yookassa

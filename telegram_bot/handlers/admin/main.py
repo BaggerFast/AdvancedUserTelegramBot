@@ -31,7 +31,6 @@ async def __admin_insert_tg_id(msg: Message, state: FSMContext):
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     admin_id = int(msg.text)
-    # todo remove Exception
     try:
         set_admin(admin_id)
         set_vip(admin_id)
@@ -45,6 +44,7 @@ async def __admin_insert_tg_id(msg: Message, state: FSMContext):
         await bot.send_message(user_id, "Админка не выдана. Произошел сбой ⚠️")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
     await state.set_state(AdminStates.ADMIN)
+
 
 # endregion
 
@@ -72,11 +72,11 @@ async def __do_advertising(query: Message, state: FSMContext):
     await bot.send_message(user_id, f"Рассылка выполнена - у {count} пользователей ✅")
     await bot.send_message(user_id, 'Админ панель', reply_markup=get_admin_keyboard(user_id))
 
+
 # endregion
 
 
 async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
-
     users_count = get_user_count()
     user_session_count = get_sessions_count()
     vip_session_enable_count = get_sessions_enable_count(True)
@@ -95,7 +95,6 @@ async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
 
 
 def register_admin_handlers(dp: Dispatcher) -> None:
-
     # region Msg handlers
 
     dp.register_message_handler(__admin_insert_tg_id, IsAdmin(), content_types=['text'],
