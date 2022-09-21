@@ -1,4 +1,4 @@
-# PyConsoleMenu
+# Advanced User Telegram Bot
 ![Language](https://img.shields.io/badge/Language-Python3.10+-blue.svg?style=flat)
 [![BUILD-STATUS](https://github.com/BaggerFast/AdvancedUserTelegramBot/workflows/CI/badge.svg)](https://github.com/BaggerFast/AdvancedUserTelegramBot/actions)
 
