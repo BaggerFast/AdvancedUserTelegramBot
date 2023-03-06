@@ -1,5 +1,5 @@
 # Advanced User Telegram Bot
-![Language](https://img.shields.io/badge/Language-Python3.10+-blue.svg?style=flat)
+[![CodeFactor](https://www.codefactor.io/repository/github/baggerfast/advancedusertelegrambot/badge)](https://www.codefactor.io/repository/github/baggerfast/advancedusertelegrambot)
 [![BUILD-STATUS](https://github.com/BaggerFast/AdvancedUserTelegramBot/workflows/CI/badge.svg)](https://github.com/BaggerFast/AdvancedUserTelegramBot/actions)
 
 This is a telegram bot that creates a user bot for each user.
