@@ -1,7 +1,7 @@
 import sqlalchemy.exc
 
 from telegram_bot.database.main import Database
-from telegram_bot.database.models import User, Session, Payment
+from telegram_bot.database.models import User, Session
 
 
 def create_user(telegram_id: int) -> None:
@@ -19,7 +19,3 @@ def create_session(user: User, user_bot_session: str) -> None:
     session.commit()
 
 
-def create_user_payment(user: User, key) -> None:
-    session = Database().session
-    session.add(Payment(user_id=user.id, key=key))
-    session.commit()

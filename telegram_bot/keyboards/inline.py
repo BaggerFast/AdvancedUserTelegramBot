@@ -9,6 +9,5 @@ KB_CANCEL_SETUP.add(
 
 KB_INFO: Final = InlineKeyboardMarkup(1)
 KB_INFO.add(
-    InlineKeyboardButton("VIP", url=TgConfig.VIP_HELP_URL),
-    InlineKeyboardButton("FREE", url=TgConfig.FREE_HELP_URL)
+    InlineKeyboardButton("LET'S GO!", url=TgConfig.HELP_COMMANDS_URL)
 )

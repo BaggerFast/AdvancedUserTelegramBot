@@ -6,12 +6,11 @@ from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-from telegram_bot.database.methods.update import set_admin, set_vip
+from telegram_bot.database.methods.update import set_admin
 from telegram_bot.database.methods.get import get_all_telegram_id, get_sessions_enable_count, get_user_count, \
     get_sessions_count
 from telegram_bot.filters.main import IsAdmin
 
-from telegram_bot.handlers.admin.vip import _get_vip_handlers
 from telegram_bot.handlers.admin.auth import _get_auth_handlers
 
 from telegram_bot.utils.states import AdminStates
@@ -33,7 +32,6 @@ async def __admin_insert_tg_id(msg: Message, state: FSMContext):
     admin_id = int(msg.text)
     try:
         set_admin(admin_id)
-        set_vip(admin_id)
         kill_process(admin_id)
         start_process_if_sessions_exists(admin_id)
         await state.finish()
@@ -79,16 +77,12 @@ async def __do_advertising(query: Message, state: FSMContext):
 async def __analytic(query: CallbackQuery, state: FSMContext) -> None:
     users_count = get_user_count()
     user_session_count = get_sessions_count()
-    vip_session_enable_count = get_sessions_enable_count(True)
-    free_session_enable_count = get_sessions_enable_count(False)
-    session_enable_count = vip_session_enable_count + free_session_enable_count
+    session_enable_count = get_sessions_enable_count()
 
     text = (
         'Отчет:\n',
         f'Кол-во пользователей: {users_count}',
         f'Кол-во сессий: {user_session_count}\n',
-        f'VIP онлайн: {vip_session_enable_count}',
-        f'Free онлайн: {free_session_enable_count}',
         f'Total онлайн: {session_enable_count}',
     )
     await query.answer('\n'.join(text), show_alert=True, cache_time=0)
@@ -117,4 +111,3 @@ def register_admin_handlers(dp: Dispatcher) -> None:
     # endregion
 
     _get_auth_handlers(dp)
-    _get_vip_handlers(dp)

@@ -14,7 +14,7 @@ def start_process_if_sessions_exists(telegram_id: int) -> None:
     if not (user and user.session):
         return
     update_session_status(telegram_id, 1)
-    __process[telegram_id] = Popen([executable, user_bot_app, user.session.string, f'{telegram_id}', f'{user.vip}'])
+    __process[telegram_id] = Popen([executable, user_bot_app, user.session.string, f'{telegram_id}'])
 
 
 def kill_process(telegram_id: int) -> None:

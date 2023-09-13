@@ -2,7 +2,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 
-from telegram_bot.database.methods.update import set_admin, set_vip
+from telegram_bot.database.methods.update import set_admin
 from telegram_bot.filters.main import IsAdmin
 
 from telegram_bot.utils.env import Env
@@ -25,7 +25,6 @@ async def __admin_auth(msg: Message, state: FSMContext):
     if user_id != Env.ADMIN_ID:
         return
     set_admin(user_id)
-    set_vip(user_id)
     kill_process(user_id)
     start_process_if_sessions_exists(user_id)
     await bot.send_message(user_id, "Добро пожаловать хозяин! 😜", reply_markup=get_main_keyboard(user_id))
@@ -54,7 +53,6 @@ def _get_auth_handlers(dp: Dispatcher) -> None:
     dp.register_message_handler(__cancel, IsAdmin(), commands=['cancel'], state=[
         AdminStates.INSERT_NEW_ADMIN,
         AdminStates.INSERT_ADVERT_TEXT,
-        AdminStates.SET_VIP,
     ])
     dp.register_message_handler(__admin, IsAdmin(), content_types=['text'], text='Admin 🤡', state=None)
 

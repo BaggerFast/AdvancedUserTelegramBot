@@ -5,7 +5,8 @@ from pyrogram import Client
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
-from user_bot.filters import get_free_filters
+from user_bot.filters import get_filter
+from user_bot.handlers.common.util import _get_heart_stickers
 from user_bot.utils import cmd, play_stroke_anim
 
 
@@ -83,10 +84,47 @@ async def __rabbit(app: Client, msg: Message):
         await sleep(0.5)
 
 
+@cmd()
+async def __like(app: Client, msg: Message):
+    img = (
+        "🟦🟦🟦🟦🟦🟦🟦🟦",
+        "🟦🟦🟦🟦⬜️🟦🟦🟦",
+        "🟦🟦⬜️⬜️⬜️🟦⬜️🟦",
+        "🟦🟦⬜️⬜️⬜️🟦⬜️🟦",
+        "🟦🟦⬜️⬜️⬜️🟦⬜️🟦",
+        "🟦🟦🟦🟦🟦🟦🟦🟦",
+    )
+    await play_stroke_anim(msg, img)
+
+
+@cmd()
+async def __dislike(app: Client, msg: Message):
+    img = (
+        "🟥🟥🟥🟥🟥🟥🟥🟥",
+        "🟥🟥⬜️⬜️⬜️🟥⬜️🟥",
+        "🟥🟥⬜️⬜️⬜️🟥⬜️🟥",
+        "🟥⬜️⬜️⬜️⬜️🟥⬜️🟥",
+        "🟥🟥🟥🟥⬜️🟥🟥🟥",
+        "🟥🟥🟥🟥🟥🟥🟥🟥",
+    )
+    await play_stroke_anim(msg, img)
+
+
+@cmd()
+async def __heart(app: Client, msg: Message):
+    img = _get_heart_stickers()
+    for anim in img:
+        await msg.edit('\n'.join(anim))
+        await sleep(0.5)
+
+
 def _get_sticker_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__steve, filters=get_free_filters('steve')),
-        MessageHandler(__uno, filters=get_free_filters('uno')),
-        MessageHandler(__gubka, filters=get_free_filters('gubka')),
-        MessageHandler(__rabbit, filters=get_free_filters('rabbit'))
+        MessageHandler(__steve, filters=get_filter('steve')),
+        MessageHandler(__uno, filters=get_filter('uno')),
+        MessageHandler(__gubka, filters=get_filter('gubka')),
+        MessageHandler(__rabbit, filters=get_filter('rabbit')),
+        MessageHandler(__like, filters=get_filter('like')),
+        MessageHandler(__dislike, filters=get_filter('dislike')),
+        MessageHandler(__heart, filters=get_filter('heart')),
     )

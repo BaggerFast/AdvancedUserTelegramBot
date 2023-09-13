@@ -1,7 +1,6 @@
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message
 
-from telegram_bot.handlers.user.buy_vip import _register_vip_handlers
 from telegram_bot.handlers.user.user_bot import _register_user_bot_handlers
 
 from telegram_bot.utils import TgConfig
@@ -25,7 +24,7 @@ async def __teh_support(msg: Message) -> None:
 
 async def __help(msg: Message) -> None:
     bot: Bot = msg.bot
-    await bot.send_message(msg.from_user.id, "Выберите категорию команд:", reply_markup=KB_INFO)
+    await bot.send_message(msg.from_user.id, "Список комманд бота", reply_markup=KB_INFO)
 
 
 def register_users_handlers(dp: Dispatcher) -> None:
@@ -42,5 +41,4 @@ def register_users_handlers(dp: Dispatcher) -> None:
 
     # endregion
 
-    _register_vip_handlers(dp)
     _register_user_bot_handlers(dp)
