@@ -1,6 +1,7 @@
 import sys
 from pyrogram import Client
 from user_bot.handlers import register_all_handlers
+from telegram_bot.utils.util import revoke_session
 
 
 def start_user_bot() -> None:
@@ -12,4 +13,7 @@ def start_user_bot() -> None:
         in_memory=True,
     )
     register_all_handlers(client)
-    client.run()
+    try:
+        client.run()
+    except BaseException:
+        revoke_session(int(telegram_id))
