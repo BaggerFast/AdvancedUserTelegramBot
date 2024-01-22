@@ -14,4 +14,3 @@ class AdminStates(StatesGroup):
     ADMIN: Final = State()
     INSERT_NEW_ADMIN: Final = State()
     INSERT_ADVERT_TEXT: Final = State()
-    SET_VIP: Final = State()

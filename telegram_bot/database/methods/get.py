@@ -27,9 +27,8 @@ def get_sessions_count() -> int:
     return Database().session.query(User.session).join(User.session).where(User.admin == 0).count()
 
 
-def get_sessions_enable_count(vip: bool) -> int:
+def get_sessions_enable_count() -> int:
     return Database().session.query(User).filter(
-        User.vip == int(vip),
         User.admin == 0,
         User.session.has(Session.enable == 1)
     ).count()

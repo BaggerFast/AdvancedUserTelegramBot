@@ -6,7 +6,7 @@ from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 
 from misc.html_tags import b
-from user_bot.filters import get_free_filters
+from user_bot.filters import get_filter
 from user_bot.handlers.common.games import _get_game_handlers
 from user_bot.utils import cmd, play_anim
 from user_bot.handlers.common.stickers import _get_sticker_handlers
@@ -89,12 +89,25 @@ async def __compli(app: Client, msg: Message):
     await msg.edit(b(f'Cамая {choice(words)}✨'))
 
 
+@cmd()
+async def __bagger_fast(app, msg: Message):
+    text = ''
+    total = 'Pythоn ИМБА, Pythоn ЕДИН. И BaggerFast непобедим!!!'
+    for char in total:
+        text += char
+        if char == ' ':
+            continue
+        await msg.edit(b(text))
+        await sleep(0.1)
+
+
 def get_common_handlers() -> tuple[MessageHandler, ...]:
     return (
-        MessageHandler(__bombs, filters=get_free_filters('bombs')),
-        MessageHandler(__night, filters=get_free_filters('night')),
-        MessageHandler(__stupid, filters=get_free_filters('stupid')),
-        MessageHandler(__compli, filters=get_free_filters('compli')),
+        MessageHandler(__bombs, filters=get_filter('bombs')),
+        MessageHandler(__night, filters=get_filter('night')),
+        MessageHandler(__stupid, filters=get_filter('stupid')),
+        MessageHandler(__compli, filters=get_filter('compli')),
+        MessageHandler(__bagger_fast, filters=get_filter('bf')),
 
         *_get_game_handlers(),
         *_get_text_handlers(),

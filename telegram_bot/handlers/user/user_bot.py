@@ -86,7 +86,7 @@ async def __input_oauth_code(msg: Message, state: FSMContext) -> None:
         await bot.send_message(user_id, "Код подтверждения иссек, попробуйте заново ⚠️")
         await state.finish()
         return
-    except SessionPasswordNeeded as e:
+    except SessionPasswordNeeded:
         await bot.send_message(msg.from_user.id, "Введи пароль двух-этапной аунтефикации:",
                                reply_markup=KB_CANCEL_SETUP)
         await state.set_state(CreateUserBotState.TWO_FA_PASSWORD)
@@ -113,7 +113,7 @@ async def __input_2fa_password(msg: Message, state: FSMContext) -> None:
     client: Client = __sessions[user_id]
     try:
         await client.check_password(password=msg.text)
-    except PasswordHashInvalid as e:
+    except PasswordHashInvalid:
         await bot.send_message(user_id, "Вы ввели не верный пароль двух-этапной аунтефикации! ⚠️\n"
                                         "Введи пароль ещё раз:")
         return
