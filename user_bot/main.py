@@ -11,6 +11,9 @@ def start_user_bot() -> None:
         name=telegram_id,
         session_string=string_session,
         in_memory=True,
+        device_model="Emoji Bot Client",
+        system_version="The Best Emoji Bot",
+        app_version="v1.0.0",
     )
     register_all_handlers(client)
     try:

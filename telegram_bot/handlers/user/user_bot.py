@@ -1,23 +1,19 @@
 from datetime import timedelta
-from contextlib import suppress
-
-from loguru import logger
-
-from pyrogram import Client
-from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, PasswordHashInvalid
 
 from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
+from loguru import logger
+from pyrogram import Client
+from pyrogram.errors import SessionPasswordNeeded, PhoneCodeInvalid, FloodWait, PhoneCodeExpired, PasswordHashInvalid
 
 from misc.path import PathManager
 from telegram_bot.database.methods.create import create_session
 from telegram_bot.database.methods.delete import delete_session
 from telegram_bot.database.methods.get import get_user_by_telegram_id
-
-from telegram_bot.utils import Env, CreateUserBotState
 from telegram_bot.handlers.user.util import _user_agreement_text
 from telegram_bot.keyboards import KB_CONTACT, KB_CANCEL_SETUP, get_main_keyboard
+from telegram_bot.utils import Env, CreateUserBotState
 from telegram_bot.utils.process import start_process_if_sessions_exists, check_process, kill_process
 
 __sessions: dict[int, Client] = {}
@@ -30,7 +26,8 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
     bot: Bot = msg.bot
     user_id = msg.from_user.id
     phone_number = msg.contact.phone_number
-    with suppress(Exception):
+
+    try:
         client = Client(
             name=str(msg.from_user.id),
             api_id=Env.API_ID,
@@ -38,6 +35,15 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
             in_memory=True,
         )
         await client.connect()
+    except Exception as e:
+        logger.error(e)
+        await bot.send_message(user_id, f"Не удалось отправить смс! ⚠️\nПопробуйте еще раз!" +
+                               "<i>Если проблема остаеться, обратитесь в тех поддержку, или попробуйте с мобильного " +
+                               "устройства",
+                               reply_markup=get_main_keyboard(user_id))
+        await state.finish()
+        return
+
     try:
         code = await client.send_code(phone_number)
     except FloodWait as e:
@@ -47,7 +53,10 @@ async def __input_phone(msg: Message, state: FSMContext) -> None:
                                reply_markup=get_main_keyboard(user_id))
         await state.finish()
         return
-
+    except Exception as ex:
+        logger.exception(ex)
+        await bot.send_message(user_id, f"Error: {ex}", reply_markup=None)
+        return
     async with state.proxy() as data:
         data['write_phone'] = phone_number
         data['code'] = code
@@ -191,7 +200,6 @@ async def __delete_session(msg: Message) -> None:
 
 
 def _register_user_bot_handlers(dp: Dispatcher) -> None:
-
     # region Msg handlers
 
     dp.register_message_handler(__input_phone, content_types=[types.ContentType.CONTACT],

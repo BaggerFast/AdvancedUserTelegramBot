@@ -1,5 +1,5 @@
 # Telegram
-Pyrogram==2.0.57 # dont upgrade pls, has problem with auth
+pyrogram
 aiogram==2.24
 
 # Database
